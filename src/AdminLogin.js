@@ -25,17 +25,14 @@ const AdminLogin = () => {
 
     const handleConnect = () => {
       setSocketStatus('WebSocket 연결됨');
-      console.log('Socket connected in AdminLogin');
     };
 
     const handleConnectError = (error) => {
       setSocketStatus('WebSocket 연결 실패');
-      console.error('Socket connection error in AdminLogin:', error);
     };
 
     const handleDisconnect = (reason) => {
       setSocketStatus('WebSocket 연결 끊김');
-      console.log('Socket disconnected in AdminLogin:', reason);
     };
 
     socket.on('connect', handleConnect);
@@ -53,49 +50,35 @@ const AdminLogin = () => {
     e.preventDefault();
     setError('');
 
-    // Clear previous session data
     localStorage.clear();
     document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
 
-    // Save credentials before proceeding
     localStorage.setItem('adminHotelId', hotelId);
     localStorage.setItem('adminPassword', password);
 
     try {
-      console.log('[AdminLogin] Attempting login for hotelId:', hotelId);
       const { data } = await axios.post(
         '/api/admin/login',
         { username: hotelId, password },
         { skipCsrf: true, withCredentials: true }
       );
-      console.log('[AdminLogin] Login response data:', data);
       const accessToken = data.accessToken;
       if (!accessToken || accessToken.split('.').length !== 3) {
-        console.error('[AdminLogin] Invalid accessToken received:', accessToken);
         throw new Error('Invalid accessToken received from server');
       }
       localStorage.setItem('accessToken', accessToken);
-      console.log('[AdminLogin] Login successful, accessToken:', accessToken);
-      console.log('[AdminLogin] Cookies after login:', document.cookie);
 
-      // Verify token immediately after setting
       const storedToken = localStorage.getItem('accessToken');
-      console.log('[AdminLogin] Stored accessToken:', storedToken);
       if (storedToken !== accessToken) {
-        console.error('[AdminLogin] Token mismatch after storage:', { storedToken, accessToken });
         throw new Error('Token mismatch after storage');
       }
 
-      // WebSocket 연결 시작
       socket.connect();
 
-      // Add a slight delay to ensure localStorage is updated
       setTimeout(() => {
-        console.log('[AdminLogin] Navigating to dashboard, token:', localStorage.getItem('accessToken'));
         navigate('/', { replace: true });
       }, 100);
     } catch (err) {
-      console.error('[AdminLogin] Login error:', err);
       const message = err.response?.data?.message || '로그인에 실패했습니다.';
       setError(message);
       if (message.includes('승인 대기')) {

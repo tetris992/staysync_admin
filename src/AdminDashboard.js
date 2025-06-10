@@ -1,6 +1,4 @@
-// frontend/src/AdminDashboard.js
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -42,47 +40,7 @@ const AdminDashboard = () => {
   const [salesType, setSalesType] = useState('daily');
   const [socketStatus, setSocketStatus] = useState('연결 중...');
 
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token || token.split('.').length !== 3) {
-      console.warn('No valid accessToken, redirecting to login...');
-      window.location.href = '/login';
-      return;
-    }
-
-    fetchUsersData();
-
-    const handleConnect = () => {
-      setSocketStatus('WebSocket 연결됨');
-      console.log('Socket connected in AdminDashboard');
-    };
-
-    const handleConnectError = (error) => {
-      setSocketStatus('WebSocket 연결 실패');
-      console.error('Socket connection error in AdminDashboard:', error);
-    };
-
-    const handleDisconnect = (reason) => {
-      setSocketStatus('WebSocket 연결 끊김');
-      console.log('Socket disconnected in AdminDashboard:', reason);
-    };
-
-    socket.on('connect', handleConnect);
-    socket.on('connect_error', handleConnectError);
-    socket.on('disconnect', handleDisconnect);
-
-    if (localStorage.getItem('accessToken')) {
-      socket.connect();
-    }
-
-    return () => {
-      socket.off('connect', handleConnect);
-      socket.off('connect_error', handleConnectError);
-      socket.off('disconnect', handleDisconnect);
-    };
-  }, []);
-
-  const fetchUsersData = async () => {
+  const fetchUsersData = useCallback(async () => {
     setIsLoading(true);
     setError('');
     try {
@@ -101,10 +59,45 @@ const AdminDashboard = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token || token.split('.').length !== 3) {
+      window.location.href = '/login';
+      return;
+    }
+
+    fetchUsersData();
+
+    const handleConnect = () => {
+      setSocketStatus('WebSocket 연결됨');
+    };
+
+    const handleConnectError = () => {
+      setSocketStatus('WebSocket 연결 실패');
+    };
+
+    const handleDisconnect = () => {
+      setSocketStatus('WebSocket 연결 끊김');
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('connect_error', handleConnectError);
+    socket.on('disconnect', handleDisconnect);
+
+    if (localStorage.getItem('accessToken')) {
+      socket.connect();
+    }
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('connect_error', handleConnectError);
+      socket.off('disconnect', handleDisconnect);
+    };
+  }, [fetchUsersData]);
 
   const handleToggleExpand = async (hotelId) => {
-    console.log('Expanding hotel:', hotelId);
     if (expandedHotelId === hotelId) {
       setExpandedHotelId(null);
       setSalesData({ byDate: [], byMonth: [], byBand: {} });
@@ -117,20 +110,16 @@ const AdminDashboard = () => {
     try {
       const startDate = '2025-01-01';
       const endDate = '2025-05-23';
-      console.log('Fetching sales data for hotel:', hotelId);
       const [dailyData, monthlyData] = await Promise.all([
         fetchHotelSales(hotelId, 'daily', startDate, endDate),
         fetchHotelSales(hotelId, 'monthly', startDate, endDate),
       ]);
-      console.log('Daily sales data:', dailyData);
-      console.log('Monthly sales data:', monthlyData);
       setSalesData({
         byDate: dailyData.byDate || [],
         byMonth: monthlyData.byMonth || [],
         byBand: dailyData.byBand || {},
       });
     } catch (err) {
-      console.error('Error fetching sales:', err);
       setError(`매출 데이터 로드 실패: ${err.message || '알 수 없는 오류'}`);
     } finally {
       setSalesLoading(false);
@@ -275,10 +264,10 @@ const AdminDashboard = () => {
             family: "'Segoe UI', sans-serif",
           },
           color: '#555',
-          maxRotation: 45, // 라벨 회전
+          maxRotation: 45,
           minRotation: 45,
-          autoSkip: true, // 라벨 자동 건너뛰기
-          maxTicksLimit: 10, // 최대 라벨 수 제한
+          autoSkip: true,
+          maxTicksLimit: 10,
         },
       },
       y: {
