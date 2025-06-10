@@ -1,6 +1,6 @@
 {
   "name": "admin-dashboard",
-  "homepage": "https://ztoone.kr",
+  "homepage": "https://ztoone.kr/staysync_admin",
   "version": "1.0.0",
   "private": true,
   "scripts": {
