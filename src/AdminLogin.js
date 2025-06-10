@@ -27,11 +27,11 @@ const AdminLogin = () => {
       setSocketStatus('WebSocket 연결됨');
     };
 
-    const handleConnectError = (error) => {
+    const handleConnectError = () => {
       setSocketStatus('WebSocket 연결 실패');
     };
 
-    const handleDisconnect = (reason) => {
+    const handleDisconnect = () => {
       setSocketStatus('WebSocket 연결 끊김');
     };
 
