@@ -31,7 +31,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
-    "eslint": "^8.44.0",
+    "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.1",
@@ -54,6 +54,8 @@
     "@svgr/plugin-svgo": "^8.1.0",
     "svgo": "^3.3.2",
     "postcss": "^8.4.47",
-    "webpack-dev-server": "^5.2.0"
+    "webpack-dev-server": "^5.2.0",
+    "nth-check": "^2.0.1",
+    "css-select": "^5.1.0"
   }
 }
