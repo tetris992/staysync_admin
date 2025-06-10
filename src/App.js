@@ -6,7 +6,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 export default function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL || '/staysync_admin'}>
+    <BrowserRouter basename={process.env.PUBLIC_URL || '/'}>
       <Routes>
         <Route path="/login" element={<AdminLogin />} />
         <Route
