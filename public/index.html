@@ -3,11 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <title>Single Page Apps for GitHub Pages</title>
-    <script>
-      const path = window.location.pathname;
-      sessionStorage.setItem('redirect', path);
-      window.location = '/staysync_admin/';
-    </script>
+    <base href="/staysync_admin/" /> <!-- Set base URL for subfolder -->
   </head>
-  <body></body>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
