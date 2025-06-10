@@ -2,7 +2,7 @@ import { parse, isValid } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { ko, enUS } from 'date-fns/locale';
 
-// import HotelSettingsModel from '../models/HotelSettings.js';
+// import HotelSettingsModel from '../models/HotelSettings.js'; // 제거
 
 // Constants
 const DEFAULT_TIMEZONE = process.env.TIMEZONE || 'Asia/Seoul';
@@ -11,7 +11,7 @@ const DEFAULT_CHECK_OUT_TIME = '11:00';
 const MAX_CACHE_SIZE = 1000; // Limit cache size to prevent memory issues
 const SENSITIVE_LOGGING = typeof process !== 'undefined' && process.env && process.env.NODE_ENV !== 'production';
 
-// Cache for parsed dates (simple LRU-like implementation)
+// Cache for parsed dates
 const parsedDateCache = new Map();
 
 /**
@@ -30,7 +30,7 @@ const cleanString = (str) => {
 };
 
 /**
- * Retrieves the default check-in or check-out time for a hotel.
+ * Fetches hotel default time via API (to be implemented in backend).
  * @param {string} hotelId - The hotel ID.
  * @param {'checkIn' | 'checkOut'} type - The type of time to retrieve.
  * @returns {Promise<string>} - The time in HH:mm format.
@@ -40,8 +40,14 @@ const getHotelDefaultTime = async (hotelId, type) => {
   if (!hotelId) return defaultTimes[type];
 
   try {
-    const settings = await HotelSettingsModel.findOne({ hotelId });
-    const time = settings?.[type === 'checkIn' ? 'checkInTime' : 'checkOutTime'];
+    // Replace with actual API call
+    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/hotel/settings`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    const settings = await response.json();
+    const time = settings?.[type === 'checkIn' ? 'checkInTime' : 'checkOutTime'] || defaultTimes[type];
     if (!time) throw new Error(`No ${type} time found in settings`);
     return time;
   } catch (error) {
@@ -54,12 +60,11 @@ const getHotelDefaultTime = async (hotelId, type) => {
 
 /**
  * Parses a date string and returns an ISO 8601 string in the specified timezone.
- * Caches results to improve performance.
  * @param {string} dateString - The date string to parse.
  * @param {string|null} [hotelId=null] - The hotel ID for default times.
  * @param {boolean} [isCheckIn=true] - Whether to use check-in (true) or check-out (false) time.
  * @param {string} [timezone=DEFAULT_TIMEZONE] - The target timezone.
- * @returns {Promise<string|null>} - ISO 8601 string (e.g., "2025-06-10T16:00:00+09:00") or null if invalid.
+ * @returns {Promise<string|null>} - ISO 8601 string or null if invalid.
  */
 export const parseDate = async (
   dateString,
@@ -74,7 +79,6 @@ export const parseDate = async (
     return null;
   }
 
-  // Check cache
   const cacheKey = `${dateString}|${hotelId}|${isCheckIn}|${timezone}`;
   if (parsedDateCache.has(cacheKey)) {
     return parsedDateCache.get(cacheKey);
@@ -82,7 +86,6 @@ export const parseDate = async (
 
   const cleaned = cleanString(dateString);
 
-  // Early validation for common invalid patterns
   if (!/\d{4}/.test(cleaned)) {
     if (SENSITIVE_LOGGING) {
       console.warn('[dateParser.js] Invalid date string (no year):', cleaned);
@@ -91,7 +94,6 @@ export const parseDate = async (
     return null;
   }
 
-  // 1) Handle "yyyy-MM-dd" format
   if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
     const dt = parse(cleaned, 'yyyy-MM-dd', new Date());
     if (isValid(dt)) {
@@ -104,7 +106,6 @@ export const parseDate = async (
     }
   }
 
-  // 2) Try various date formats
   const dateFormats = [
     "yyyy-MM-dd'T'HH:mm:ss.SSS",
     "yyyy-MM-dd'T'HH:mm:ss",
@@ -145,7 +146,6 @@ export const parseDate = async (
     for (const fmt of dateFormats) {
       const dt = parse(cleaned, fmt, new Date(), { locale });
       if (isValid(dt)) {
-        // Apply default time if format lacks time component
         if (!/HH|mm/.test(fmt)) {
           const [hh, mm] = (await getHotelDefaultTime(hotelId, isCheckIn ? 'checkIn' : 'checkOut')).split(':');
           dt.setHours(Number(hh), Number(mm), 0, 0);
@@ -158,11 +158,9 @@ export const parseDate = async (
     }
   }
 
-  // 3) Try JS Date parsing
   try {
     const dt = new Date(cleaned);
     if (isValid(dt)) {
-      // Apply default time if input lacks time component
       if (!/\d{1,2}:\d{2}(:\d{2})?/.test(cleaned)) {
         const [hh, mm] = (await getHotelDefaultTime(hotelId, isCheckIn ? 'checkIn' : 'checkOut')).split(':');
         dt.setHours(Number(hh), Number(mm), 0, 0);
@@ -178,15 +176,11 @@ export const parseDate = async (
     }
   }
 
-  // Cache null for invalid dates
   parsedDateCache.set(cacheKey, null);
   manageCacheSize();
   return null;
 };
 
-/**
- * Manages cache size to prevent memory bloat.
- */
 const manageCacheSize = () => {
   if (parsedDateCache.size > MAX_CACHE_SIZE) {
     const keys = parsedDateCache.keys();
