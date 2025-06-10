@@ -1,9 +1,10 @@
 {
   "name": "admin-dashboard",
+  "homepage": "https://tetris992.github.io/staysync_admin",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -11,27 +12,27 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "chart.js": "^4.4.9",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "date-fns": "^4.1.0",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.26.2",
     "react-scripts": "^5.0.1",
+    "socket.io-client": "^4.8.1",
     "workbox-cacheable-response": "^7.0.0",
     "workbox-google-analytics": "^7.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.11.1",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^8.57.1",
+    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-react": "^7.37.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "gh-pages": "^6.1.1",
     "svgo": "^3.3.2"
-  },
-  "overrides": {
-    "eslint": "^9.11.1",
-    "svgo": "^3.3.2",
-    "@svgr/plugin-svgo": "^8.1.0",
-    "@svgr/webpack": "^8.1.0",
-    "postcss": "^8.4.31",
-    "resolve-url-loader": "^5.0.0"
   },
   "browserslist": {
     "production": [

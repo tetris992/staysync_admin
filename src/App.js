@@ -1,15 +1,25 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import AdminDashboard from './admin/AdminDashboard';
+// src/App.js
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import AdminLogin from './AdminLogin'
+import AdminDashboard from './AdminDashboard'
+import ProtectedRoute from './ProtectedRoute'
 
-const App = () => {
+export default function App() {
   return (
-    <Router>
-      <Switch>
-        <Route path="/" component={AdminDashboard} />
-      </Switch>
-    </Router>
-  );
-};
-
-export default App;
+    <BrowserRouter basename="/staysync_admin">
+      <Routes>
+        <Route path="login" element={<AdminLogin />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace/>} />
+      </Routes>
+    </BrowserRouter>
+  )
+}

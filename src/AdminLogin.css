@@ -1,0 +1,93 @@
+/* AdminLogin.css */
+
+.login-container {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.login-container h2 {
+  margin-bottom: 24px;
+  font-size: 1.6rem;
+  text-align: center;
+  color: #1a237e;
+}
+
+.login-container form > div {
+  margin-bottom: 20px;
+}
+
+.login-container label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.login-container .error {
+  margin-bottom: 16px;
+  color: #d32f2f;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.login-container button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a237e;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-container button[type="submit"]:hover {
+  background-color: #15186a;
+}
+
+.login-container .show-password-btn {
+  position: absolute;
+  right: 12px;
+  top: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.login-container .show-password-btn:hover {
+  color: #333;
+}
+
+/* Socket status text */
+.login-container p {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    margin: 40px 16px;
+    padding: 24px;
+  }
+}
