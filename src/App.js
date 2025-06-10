@@ -1,15 +1,14 @@
-// src/App.js
-import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import AdminLogin from './AdminLogin'
-import AdminDashboard from './AdminDashboard'
-import ProtectedRoute from './ProtectedRoute'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import AdminLogin from './AdminLogin';
+import AdminDashboard from './AdminDashboard';
+import ProtectedRoute from './ProtectedRoute';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/staysync_admin">
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Routes>
-        <Route path="login" element={<AdminLogin />} />
+        <Route path="/login" element={<AdminLogin />} />
         <Route
           path="/"
           element={
@@ -18,8 +17,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace/>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

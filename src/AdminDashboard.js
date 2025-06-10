@@ -1,7 +1,6 @@
 // frontend/src/AdminDashboard.js
 
 import React, { useState, useEffect } from 'react';
-import { fetchUsers, updateUserStatus, fetchHotelSales } from './api/api';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,6 +12,8 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+
+import { fetchUsers, updateUserStatus, fetchHotelSales } from './api/api';
 import socket from './socket';
 import './AdminDashboard.css';
 

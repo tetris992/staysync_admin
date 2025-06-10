@@ -1,50 +1,41 @@
-name: Deploy to Netlify
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main # Trigger deployment on push to main branch
+      - main
   pull_request:
     branches:
-      - main # Run build on PRs to main for validation
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Adjust based on your Node.js version
-          cache: 'npm' # Cache npm dependencies
+          node-version: '18'
+          cache: 'npm'
 
-      # Install dependencies
       - name: Install dependencies
-        run: npm ci # Use npm ci for clean installs
+        run: npm ci
 
-      # Build the React app
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
         run: npm run build
 
-      # Deploy to Netlify
-      - name: Deploy to Netlify
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on main branch push
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npm install -g netlify-cli
-          netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
-
-      # Run tests (optional)
-      - name: Run tests
-        run: npm test
-        if: github.event_name == 'pull_request' # Run tests on PRs
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
+          branch: gh-pages
