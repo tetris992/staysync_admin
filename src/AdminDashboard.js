@@ -33,7 +33,11 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [expandedHotelId, setExpandedHotelId] = useState(null);
-  const [salesData, setSalesData] = useState({ byDate: [], byMonth: [], byBand: {} });
+  const [salesData, setSalesData] = useState({
+    byDate: [],
+    byMonth: [],
+    byBand: {},
+  });
   const [salesLoading, setSalesLoading] = useState(false);
   const [salesType, setSalesType] = useState('daily');
   const [socketStatus, setSocketStatus] = useState('연결 중...');
@@ -85,7 +89,9 @@ const AdminDashboard = () => {
       const data = await fetchUsers(filter);
       setUsers(data);
     } catch (err) {
-      const message = err.status ? `오류 ${err.status}: ${err.message}` : `서버 연결 실패: ${err.message}`;
+      const message = err.status
+        ? `오류 ${err.status}: ${err.message}`
+        : `서버 연결 실패: ${err.message}`;
       setError(message);
       if (err.status === 401) {
         setTimeout(() => (window.location.href = '/login'), 2000);
@@ -132,7 +138,11 @@ const AdminDashboard = () => {
   };
 
   const handleUpdateStatus = async (hotelId, status) => {
-    if (!window.confirm(`사용자 ${hotelId}의 상태를 ${status}(으)로 변경하시겠습니까?`)) {
+    if (
+      !window.confirm(
+        `사용자 ${hotelId}의 상태를 ${status}(으)로 변경하시겠습니까?`
+      )
+    ) {
       return;
     }
     setError('');
@@ -141,16 +151,27 @@ const AdminDashboard = () => {
       fetchUsersData();
       setExpandedHotelId(null);
     } catch (err) {
-      const message = err.status ? `오류 ${err.status}: ${err.message}` : `상태 업데이트 실패: ${err.message}`;
+      const message = err.status
+        ? `오류 ${err.status}: ${err.message}`
+        : `상태 업데이트 실패: ${err.message}`;
       setError(message);
     }
   };
 
   const getChartData = (type) => {
     const data = type === 'daily' ? salesData.byDate : salesData.byMonth;
-    const labels = data.map((item) => (type === 'daily' ? item.date : item.month));
+    const labels = data.map((item) =>
+      type === 'daily' ? item.date : item.month
+    );
     const bands = ['현장', '단잠', '대실', 'OTA', '야놀자', '여기어때'];
-    const colors = ['#1a237e', '#4caf50', '#f44336', '#ff9800', '#3f51b5', '#e91e63'];
+    const colors = [
+      '#1a237e',
+      '#4caf50',
+      '#f44336',
+      '#ff9800',
+      '#3f51b5',
+      '#e91e63',
+    ];
 
     let datasets;
 
@@ -176,7 +197,10 @@ const AdminDashboard = () => {
     }
 
     const totalRevenues = data.map((item) => {
-      return Object.values(item.bands).reduce((sum, value) => sum + (value || 0), 0);
+      return Object.values(item.bands).reduce(
+        (sum, value) => sum + (value || 0),
+        0
+      );
     });
 
     return {
@@ -339,7 +363,9 @@ const AdminDashboard = () => {
                 <React.Fragment key={user.hotelId}>
                   <tr
                     onClick={() => handleToggleExpand(user.hotelId)}
-                    className={expandedHotelId === user.hotelId ? 'expanded' : ''}
+                    className={
+                      expandedHotelId === user.hotelId ? 'expanded' : ''
+                    }
                   >
                     <td>{user.hotelId}</td>
                     <td>{user.hotelName}</td>
@@ -350,20 +376,30 @@ const AdminDashboard = () => {
                     <td>{user.isVerified ? '인증됨' : '미인증'}</td>
                     <td>
                       {user.activationDeadline
-                        ? new Date(user.activationDeadline).toLocaleDateString('ko-KR')
+                        ? new Date(user.activationDeadline).toLocaleDateString(
+                            'ko-KR'
+                          )
                         : '-'}
                     </td>
                     <td>
                       {user.verificationExpiresAt
-                        ? new Date(user.verificationExpiresAt).toLocaleDateString('ko-KR')
+                        ? new Date(
+                            user.verificationExpiresAt
+                          ).toLocaleDateString('ko-KR')
                         : '-'}
                     </td>
-                    <td>{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
-                    <td>{new Date(user.updatedAt).toLocaleDateString('ko-KR')}</td>
+                    <td>
+                      {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+                    </td>
+                    <td>
+                      {new Date(user.updatedAt).toLocaleDateString('ko-KR')}
+                    </td>
                     <td onClick={(e) => e.stopPropagation()}>
                       {user.status !== 'active' && (
                         <button
-                          onClick={() => handleUpdateStatus(user.hotelId, 'active')}
+                          onClick={() =>
+                            handleUpdateStatus(user.hotelId, 'active')
+                          }
                           className="action-button approve-button"
                           aria-label={`${user.hotelId} 승인`}
                         >
@@ -372,7 +408,9 @@ const AdminDashboard = () => {
                       )}
                       {user.status !== 'disabled' && (
                         <button
-                          onClick={() => handleUpdateStatus(user.hotelId, 'disabled')}
+                          onClick={() =>
+                            handleUpdateStatus(user.hotelId, 'disabled')
+                          }
                           className="action-button suspend-button"
                           aria-label={`${user.hotelId} 중지`}
                         >
@@ -399,25 +437,36 @@ const AdminDashboard = () => {
                             </select>
                           </div>
                           {salesLoading ? (
-                            <p className="loading-text">매출 데이터 로딩 중...</p>
-                          ) : salesData[salesType === 'daily' ? 'byDate' : 'byMonth'].length === 0 ? (
-                            <p className="no-data-message">선택한 기간에 매출 데이터가 없습니다.</p>
+                            <p className="loading-text">
+                              매출 데이터 로딩 중...
+                            </p>
+                          ) : salesData[
+                              salesType === 'daily' ? 'byDate' : 'byMonth'
+                            ].length === 0 ? (
+                            <p className="no-data-message">
+                              선택한 기간에 매출 데이터가 없습니다.
+                            </p>
                           ) : (
                             <>
                               <div className="band-summary">
                                 <h4>밴드별 총 매출</h4>
                                 <ul>
-                                  {Object.entries(salesData.byBand).map(([band, revenue]) => (
-                                    <li key={band}>
-                                      {band}: {revenue.toLocaleString()}원
-                                    </li>
-                                  ))}
+                                  {Object.entries(salesData.byBand).map(
+                                    ([band, revenue]) => (
+                                      <li key={band}>
+                                        {band}: {revenue.toLocaleString()}원
+                                      </li>
+                                    )
+                                  )}
                                 </ul>
                               </div>
                               <div className="chart-container">
                                 <Bar
                                   data={getChartData(salesType)}
-                                  options={chartOptions(salesType, getChartData(salesType).totalRevenues)}
+                                  options={chartOptions(
+                                    salesType,
+                                    getChartData(salesType).totalRevenues
+                                  )}
                                 />
                               </div>
                             </>

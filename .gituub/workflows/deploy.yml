@@ -31,7 +31,7 @@ jobs:
       - name: Build
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
-        run: npm run build
+        run: npm run build -- --public-path=/staysync_admin/
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -39,3 +39,4 @@ jobs:
         with:
           folder: build
           branch: gh-pages
+          target-folder: staysync_admin
