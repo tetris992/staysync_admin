@@ -26,7 +26,8 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint -- --max-warnings=0
+        continue-on-error: false
 
       - name: Build
         env:
@@ -40,7 +41,6 @@ jobs:
         with:
           folder: build
           branch: gh-pages
-          # target-folder 제거, gh-pages 루트에 배포
           clean: true
 
       - name: Verify deployment

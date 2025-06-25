@@ -1,40 +1,35 @@
 import axios from 'axios';
-
 import ApiError from '../utils/ApiError';
 
 // Constants
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://staysync.org';
-const DEFAULT_TIMEOUT = 10000; // 10 seconds
+const DEFAULT_TIMEOUT = 10000; // 10초
 const SENSITIVE_LOGGING = process.env.NODE_ENV !== 'production';
 
-// Validate BASE_URL in non-production
+// 개발 환경에서 BASE_URL 로그 출력 및 경고
 if (!process.env.REACT_APP_API_BASE_URL && SENSITIVE_LOGGING) {
-  console.warn(
-    '[api.js] REACT_APP_API_BASE_URL is not set. Using default:',
-    BASE_URL
-  );
+  console.warn('[api.js] REACT_APP_API_BASE_URL is not set. Using default:', BASE_URL);
 }
-
 if (SENSITIVE_LOGGING) {
   console.log('[api.js] BASE_URL:', BASE_URL);
 }
 
-// Axios instance
+// Axios 인스턴스 생성
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  withCredentials: true, // 쿠키 자동 전송
   timeout: DEFAULT_TIMEOUT,
 });
 
-// Cache for CSRF token fetch to prevent race conditions
+// CSRF 토큰 fetch 중복 호출 방지를 위한 Promise 캐시
 let csrfTokenPromise = null;
 
-// Request Interceptor
+// 요청 인터셉터 (토큰, CSRF 헤더 세팅)
 api.interceptors.request.use(
   async (config) => {
-    // Ensure skipCsrf is a boolean
     config.skipCsrf = !!config.skipCsrf;
 
+    // skipCsrf 옵션 있을 때 CSRF 토큰 처리 생략
     if (config.skipCsrf) {
       if (SENSITIVE_LOGGING) {
         console.log('[api.js] Skipping CSRF fetch for request:', config.url);
@@ -42,7 +37,7 @@ api.interceptors.request.use(
       return config;
     }
 
-    // Add Authorization header if access token exists
+    // 액세스 토큰 Authorization 헤더에 추가
     const token = localStorage.getItem('accessToken');
     if (SENSITIVE_LOGGING) {
       console.log('[api.js] Access token:', token ? 'present' : 'missing');
@@ -51,7 +46,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Handle CSRF for non-GET requests (except CSRF endpoint)
+    // GET 요청이 아니고 CSRF 토큰 발급 API가 아니면 CSRF 헤더 추가
     if (
       config.method.toLowerCase() !== 'get' &&
       !config.url.includes('/api/csrf-token')
@@ -64,7 +59,6 @@ api.interceptors.request.use(
           console.log('[api.js] Fetching new CSRF token');
         }
 
-        // Reuse existing CSRF token fetch if in progress
         if (!csrfTokenPromise) {
           csrfTokenPromise = api.get('/api/csrf-token', {
             skipCsrf: true,
@@ -79,13 +73,10 @@ api.interceptors.request.use(
           localStorage.setItem('csrfToken', csrfToken);
           localStorage.setItem('csrfTokenId', csrfTokenId);
           if (SENSITIVE_LOGGING) {
-            console.log('[api.js] CSRF token fetched:', {
-              csrfToken,
-              csrfTokenId,
-            });
+            console.log('[api.js] CSRF token fetched:', { csrfToken, csrfTokenId });
           }
         } finally {
-          csrfTokenPromise = null; // Clear cache
+          csrfTokenPromise = null;
         }
       }
 
@@ -94,13 +85,9 @@ api.interceptors.request.use(
     }
 
     if (SENSITIVE_LOGGING) {
-      console.log(
-        '[api.js] Request:',
-        config.method.toUpperCase(),
-        config.url,
-        config.data
-      );
+      console.log('[api.js] Request:', config.method.toUpperCase(), config.url, config.data);
     }
+
     return config;
   },
   (error) => {
@@ -109,13 +96,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor
+// 응답 인터셉터 (토큰 만료 처리 및 재발급 자동화)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 403 (CSRF token issues)
+    // 403: CSRF 토큰 문제 발생 시 재발급 후 재시도
     if (error.response?.status === 403 && !originalRequest._retryCsrf) {
       originalRequest._retryCsrf = true;
       try {
@@ -140,7 +127,7 @@ api.interceptors.response.use(
       }
     }
 
-    // Handle 401 (access token issues)
+    // 401: 액세스 토큰 만료 시 토큰 재발급 후 재시도
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
@@ -160,7 +147,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         console.error('[api.js] Access token refresh failed:', refreshError);
-        // Clear only auth-related localStorage keys
         localStorage.removeItem('accessToken');
         localStorage.removeItem('csrfToken');
         localStorage.removeItem('csrfTokenId');
@@ -174,15 +160,15 @@ api.interceptors.response.use(
   }
 );
 
-// API Functions
+// API 함수 모음
+
+// 사용자 목록 조회
 export const fetchUsers = async (status) => {
   try {
-    // Validate status
-    const validStatuses = ['all', 'active', 'inactive', 'pending']; // Adjust as needed
+    const validStatuses = ['all', 'active', 'inactive', 'pending']; // 서버의 status 값과 일치시켜야 함
     if (status && !validStatuses.includes(status)) {
       throw new ApiError(400, 'Invalid status parameter');
     }
-
     if (SENSITIVE_LOGGING) {
       console.log('[api.js] Fetching users with status:', status);
     }
@@ -190,11 +176,9 @@ export const fetchUsers = async (status) => {
       params: { status: status === 'all' ? undefined : status },
       timeout: DEFAULT_TIMEOUT,
     });
-
     if (!response.data?.data) {
       throw new ApiError(500, 'Server did not return user data');
     }
-
     if (SENSITIVE_LOGGING) {
       console.log('[api.js] Users response:', response.data);
     }
@@ -208,25 +192,23 @@ export const fetchUsers = async (status) => {
   }
 };
 
+// 사용자 상태 업데이트 (승인/중지 등)
 export const updateUserStatus = async (hotelId, status) => {
   try {
-    // Validate inputs
     if (!hotelId || typeof hotelId !== 'string') {
       throw new ApiError(400, 'Invalid hotelId');
     }
-    const validStatuses = ['active', 'inactive', 'pending']; // Adjust as needed
+
+    // 서버가 허용하는 status 값과 정확히 맞춰야 합니다!
+    const validStatuses = ['active', 'inactive', 'pending'];
     if (!validStatuses.includes(status)) {
       throw new ApiError(400, 'Invalid status');
     }
 
     if (SENSITIVE_LOGGING) {
-      console.log(
-        '[api.js] Updating status for hotelId:',
-        hotelId,
-        'to:',
-        status
-      );
+      console.log('[api.js] Updating status for hotelId:', hotelId, 'to:', status);
     }
+
     const response = await api.patch(`/api/admin/users/${hotelId}/status`, {
       status,
     });
@@ -234,7 +216,6 @@ export const updateUserStatus = async (hotelId, status) => {
     if (!response.data?.data) {
       throw new ApiError(500, 'Server did not return status update data');
     }
-
     if (SENSITIVE_LOGGING) {
       console.log('[api.js] Update status response:', response.data);
     }
@@ -248,42 +229,29 @@ export const updateUserStatus = async (hotelId, status) => {
   }
 };
 
+// 호텔 매출 데이터 조회
 export const fetchHotelSales = async (hotelId, type, startDate, endDate) => {
   try {
-    // Validate inputs
     if (!hotelId || typeof hotelId !== 'string') {
       throw new ApiError(400, 'Invalid hotelId');
     }
-    const validTypes = ['daily', 'weekly', 'monthly']; // Adjust as needed
+    const validTypes = ['daily', 'weekly', 'monthly'];
     if (!validTypes.includes(type)) {
       throw new ApiError(400, 'Invalid type');
     }
-    if (
-      !startDate ||
-      !endDate ||
-      isNaN(Date.parse(startDate)) ||
-      isNaN(Date.parse(endDate))
-    ) {
+    if (!startDate || !endDate || isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
       throw new ApiError(400, 'Invalid date range');
     }
-
     if (SENSITIVE_LOGGING) {
-      console.log(
-        '[api.js] Fetching sales for hotelId:',
-        hotelId,
-        'type:',
-        type
-      );
+      console.log('[api.js] Fetching sales for hotelId:', hotelId, 'type:', type);
     }
     const response = await api.get(`/api/sales/${hotelId}/sales`, {
       params: { type, startDate, endDate },
       timeout: DEFAULT_TIMEOUT,
     });
-
     if (!response.data) {
       throw new ApiError(500, 'Server did not return sales data');
     }
-
     if (SENSITIVE_LOGGING) {
       console.log('[api.js] Sales response:', response.data);
     }
