@@ -2,7 +2,7 @@
   "name": "hms-admin-dashboard",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://ztoone.kr/staysync_admin",
+  "homepage": "https://ztoone.kr",
   "dependencies": {
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
