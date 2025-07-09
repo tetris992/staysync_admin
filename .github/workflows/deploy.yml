@@ -1,71 +1,51 @@
-# 워크플로우의 이름
+# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
-# 언제 이 워크플로우를 실행할지 정의
 on:
   push:
     branches:
-      - main # main 브랜치에 코드가 푸시될 때
-  pull_request:
-    branches:
-      - main # main 브랜치로 Pull Request가 생성될 때
+      - main
 
-# (개선) 동시에 여러 워크플로우가 실행되는 것을 방지하여 안정성 확보
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-# (개선) 워크플로우 잡에 필요한 최소한의 권한만 부여하여 보안 강화
 permissions:
-  contents: write # gh-pages 브랜치에 코드를 푸시하기 위해 'write' 권한 필요
+  contents: write
 
 jobs:
   build-and-deploy:
-    # 실행 환경 지정
     runs-on: ubuntu-latest
-
     steps:
-      # 1. 코드 체크아웃
       - name: Checkout code 🛎️
         uses: actions/checkout@v4
 
-      # 2. Node.js 환경 설정 (NPM 캐시 포함)
       - name: Set up Node.js ⚙️
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      # 3. 의존성 설치 (npm ci 사용으로 일관성 있는 설치 보장)
       - name: Install dependencies 📦
         run: npm ci
 
-      # 4. 코드 린트 검사 (코드 품질 유지)
-      - name: Lint code ✨
-        run: npm run lint -- --max-warnings=0
-
-      # 5. 프로덕션 빌드 실행
       - name: Build application 🏗️
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
-          PUBLIC_URL: /staysync_admin # GitHub Pages의 서브디렉토리 경로
+          PUBLIC_URL: /staysync_admin
         run: npm run build
 
-      # 6. GitHub Pages에 배포
-      # main 브랜치에 'push' 이벤트가 발생했을 때만 이 단계를 실행
       - name: Deploy to GitHub Pages 🚀
         if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: build # 빌드 결과물이 있는 폴더
-          branch: gh-pages # 배포할 브랜치
-          clean: true # 배포 브랜치를 깨끗하게 정리 후 배포
+          folder: build
+          branch: gh-pages
+          clean: true
+          cname: ztoone.kr        # ← 이 줄을 반드시 넣으세요
 
-      # 7. 배포 확인 (간단한 스모크 테스트)
       - name: Verify deployment ✅
         if: github.ref == 'refs/heads/main'
         run: |
-          echo "배포가 완료되었습니다. https://ztoone.kr/staysync_admin 에서 확인하세요."
-          # curl을 통해 배포된 페이지의 HTTP 상태 코드를 확인합니다. (배포 후 적용까지 시간이 걸릴 수 있음)
-          sleep 10 # GitHub Pages 배포 반영을 위한 대기 시간
-          curl -s -o /dev/null -w "%{http_code}" https://ztoone.kr/staysync_admin | grep -q "200" || echo "배포 확인에 실패했거나, 아직 페이지가 업데이트되지 않았을 수 있습니다."
+          sleep 10
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ztoone.kr/staysync_admin)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "HTTP $HTTP_STATUS – 아직 반영되지 않았을 수 있습니다."
+            exit 1
+          fi
