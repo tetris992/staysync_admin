@@ -147,7 +147,7 @@ tr.expanded-details td {
 }
 
 .action-button.suspend-button {
-  background-color: #f44336;
+  background-color: #cacaca;
   color: #fff;
 }
 .action-button.suspend-button:hover {

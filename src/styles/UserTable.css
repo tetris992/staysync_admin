@@ -1,0 +1,76 @@
+/* src/styles/UserTable.css */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #1a237e;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* 상태 램프 */
+.status-lamp {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.status-lamp.on  { background-color: #4caf50; }
+.status-lamp.off { background-color: #f44336; }
+
+/* 상태 텍스트 색상 */
+.status-text.active   { color: #4caf50; font-weight: bold; }
+.status-text.inactive { color: #f44336; font-weight: bold; }
+.status-text.pending  { color: #ff9800; font-weight: bold; }
+
+/* 버튼 스타일 (기존 AdminDashboard.css 와 동일) */
+.action-button {
+  padding: 6px 12px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.action-button:hover {
+  transform: translateY(-1px);
+}
+.approve-button {
+  background-color: #4caf50;
+  color: #fff;
+}
+.approve-button:hover {
+  background-color: #45a049;
+}
+.suspend-button {
+  background-color: #cacaca;
+  color: #fff;
+}
+.suspend-button:hover {
+  background-color: #d32f2f;
+}
