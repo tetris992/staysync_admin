@@ -1,0 +1,13 @@
+/* 깜빡임 애니메이션: 0.5초 간격으로 5번 반복 = 총 2.5초 */
+@keyframes blink {
+  0%, 100% { background-color: transparent; }
+  50%      { background-color: rgba(255, 235, 59, 0.5); }
+}
+.blink {
+  animation: blink 0.5s ease-in-out 5;
+}
+
+/* 확장 행 스타일 (기존 유지) */
+tr.expanded {
+  background-color: #e8eaf6;
+}

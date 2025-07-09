@@ -1,22 +1,50 @@
-import React from 'react';
-import { useUsers } from '../../hooks/useUsers';
+import React, { useState } from 'react';
 import SalesDetails from './SalesDetails';
+import '../../styles/UserTableRow.css';
 
-const UserTableRow = ({ user, isExpanded, onToggleExpand }) => {
-  // useUsers 훅을 여기서 직접 호출하지 않고, props로 함수를 받아오는 것이 좋습니다.
-  // 하지만 현재 구조상 편의를 위해 여기서 호출합니다.
-  const { updateUserStatus } = useUsers();
-  
-  const handleUpdateStatus = (e, status) => {
+const UserTableRow = ({
+  user,
+  isExpanded,
+  onToggleExpand,
+  updateStatus,     // ← AdminDashboard → UserTable 에서 전달된 함수
+}) => {
+  const [blinking, setBlinking] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  const handleClick = async (e, status) => {
     e.stopPropagation();
-    updateUserStatus(user.hotelId, status);
+    if (updating) return;
+    setUpdating(true);
+
+    // updateStatus가 함수인지 체크
+    if (typeof updateStatus !== 'function') {
+      console.error('updateStatus is not a function', updateStatus);
+      setUpdating(false);
+      return;
+    }
+
+    const ok = await updateStatus(user.hotelId, status);
+
+    if (ok) {
+      setBlinking(true);
+      setTimeout(() => setBlinking(false), 2500); // 2.5초 깜빡임
+    }
+
+    setUpdating(false);
   };
-  
-  const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('ko-KR') : '-';
+
+  const formatDate = (dt) =>
+    dt ? new Date(dt).toLocaleDateString('ko-KR') : '-';
 
   return (
     <>
-      <tr onClick={onToggleExpand} className={isExpanded ? 'expanded' : ''} style={{ cursor: 'pointer' }}>
+      <tr
+        onClick={onToggleExpand}
+        className={`${isExpanded ? 'expanded' : ''} ${
+          blinking ? 'blink' : ''
+        }`}
+        style={{ transition: 'background-color 0.3s ease' }}
+      >
         <td>{user.hotelId}</td>
         <td>{user.hotelName}</td>
         <td>{user.email}</td>
@@ -25,17 +53,32 @@ const UserTableRow = ({ user, isExpanded, onToggleExpand }) => {
         <td>{formatDate(user.createdAt)}</td>
         <td>
           {user.status !== 'active' && (
-            <button onClick={(e) => handleUpdateStatus(e, 'active')} className="action-button approve-button">승인</button>
+            <button
+              disabled={updating}
+              onClick={(e) => handleClick(e, 'active')}
+              className="action-button approve-button"
+            >
+              {updating ? '처리 중…' : '승인'}
+            </button>
           )}
           {user.status !== 'inactive' && (
-            <button onClick={(e) => handleUpdateStatus(e, 'inactive')} className="action-button suspend-button">중지</button>
+            <button
+              disabled={updating}
+              onClick={(e) => handleClick(e, 'inactive')}
+              className="action-button suspend-button"
+            >
+              {updating ? '처리 중…' : '중단'}
+            </button>
           )}
         </td>
       </tr>
       {isExpanded && (
         <tr className="expanded-details">
           <td colSpan="7">
-            <SalesDetails hotelId={user.hotelId} hotelName={user.hotelName} />
+            <SalesDetails
+              hotelId={user.hotelId}
+              hotelName={user.hotelName}
+            />
           </td>
         </tr>
       )}

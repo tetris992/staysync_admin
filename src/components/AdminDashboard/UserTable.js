@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import UserTableRow from './UserTableRow';
 
-const UserTable = ({ users }) => {
+const UserTable = ({ users, updateStatus }) => {
   const [expandedHotelId, setExpandedHotelId] = useState(null);
 
   if (!users || users.length === 0) {
@@ -28,7 +28,12 @@ const UserTable = ({ users }) => {
               key={user.hotelId}
               user={user}
               isExpanded={expandedHotelId === user.hotelId}
-              onToggleExpand={() => setExpandedHotelId(prev => prev === user.hotelId ? null : user.hotelId)}
+              onToggleExpand={() =>
+                setExpandedHotelId((prev) =>
+                  prev === user.hotelId ? null : user.hotelId
+                )
+              }
+              updateStatus={updateStatus}   // ← 여기서 꼭 전달
             />
           ))}
         </tbody>

@@ -3,40 +3,62 @@ import { toast } from 'react-toastify';
 import { fetchUsers as apiFetchUsers, updateUserStatus as apiUpdateUserStatus } from '../api/api';
 
 export const useUsers = (initialFilter = 'all') => {
-  const [users, setUsers] = useState([]);
-  const [filter, setFilter] = useState(initialFilter);
-  const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter]     = useState(initialFilter);
+  const [users, setUsers]       = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
-  const getUsers = useCallback(async () => {
-    setIsLoading(true);
+  // 1) 사용자 목록 로드
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await apiFetchUsers(filter);
       setUsers(data);
     } catch (err) {
       toast.error(`사용자 목록 로딩 실패: ${err.message || '서버 오류'}`);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [filter]);
 
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    loadUsers();
+  }, [loadUsers]);
 
-  const updateUserStatus = async (hotelId, status) => {
-    const statusText = status === 'active' ? '승인' : '중지';
-    if (!window.confirm(`사용자 ${hotelId} 계정을 '${statusText}' 상태로 변경하시겠습니까?`)) return false;
-    
+  // 2) 상태 변경: 즉시 로컬 상태 업데이트 + 토스트 메시지 분기
+  const updateStatus = async (hotelId, status) => {
     try {
       await apiUpdateUserStatus(hotelId, status);
-      toast.success(`사용자 ${hotelId}의 상태가 성공적으로 변경되었습니다.`);
-      await getUsers();
+      // 로컬 상태 바로 변경
+      setUsers(prev =>
+        prev.map(u =>
+          u.hotelId === hotelId
+            ? { ...u, status }
+            : u
+        )
+      );
+      // 액션별 메시지
+      if (status === 'active') {
+        toast.success(`호텔 ${hotelId} 승인 완료`);
+      } else {
+        toast.success(`호텔 ${hotelId} 중단 완료`);
+      }
       return true;
     } catch (err) {
-      toast.error(`상태 변경 실패: ${err.message || '서버 오류'}`);
+      if (status === 'active') {
+        toast.error(`호텔 ${hotelId} 승인 실패: ${err.message}`);
+      } else {
+        toast.error(`호텔 ${hotelId} 중단 실패: ${err.message}`);
+      }
       return false;
     }
   };
 
-  return { users, filter, setFilter, isLoading, refreshUsers: getUsers, updateUserStatus };
+  return {
+    users,
+    filter,
+    setFilter,
+    isLoading,
+    loadUsers,
+    updateStatus,
+  };
 };
