@@ -1,0 +1,33 @@
+/* src/components/AdminDashboard/SalesMonthly.css */
+.sales-monthly {
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+}
+.sales-title {
+  font-size: 1.25rem;
+  margin-bottom: .75rem;
+  font-weight: bold;
+}
+.sales-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.sales-header button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.sales-month {
+  margin: 0 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.no-data {
+  text-align: center;
+  color: #888;
+  margin-top: 2rem;
+}

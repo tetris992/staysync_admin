@@ -1,38 +1,50 @@
-import React, { createContext, useEffect, useState, useContext } from 'react';
+// src/context/SocketContext.jsx
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import AuthContext from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const SocketContext = createContext(null);
-
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
-  const { token, isAdmin } = useContext(AuthContext);
-  const [socket, setSocket] = useState(null);
+  const { token, isAdmin } = useAuth();
   const [socketStatus, setSocketStatus] = useState('Disconnected');
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    // Only connect if the user is a logged-in admin
     if (isAdmin && token) {
-      const newSocket = io(process.env.REACT_APP_API_BASE_URL || 'https://staysync.org', {
-        path: '/socket.io',
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionAttempts: 5,
-        query: { accessToken: token },
-      });
+      const adminSocket = io(
+        // explicitly hit the /admin namespace
+        `${process.env.REACT_APP_API_BASE_URL}/admin`,
+        {
+          path: '/socket.io',      // must match your server's socket.io path
+          transports: ['websocket','polling'],
+          withCredentials: true,   // send cookies if needed
+          query: { accessToken: token },
+        }
+      );
 
-      setSocket(newSocket);
+      setSocket(adminSocket);
       setSocketStatus('Connecting');
 
-      newSocket.on('connect', () => setSocketStatus('Connected'));
-      newSocket.on('disconnect', () => setSocketStatus('Disconnected'));
-      newSocket.on('connect_error', (err) => setSocketStatus(`Connection Failed: ${err.message}`));
+      adminSocket.on('connect',    () => setSocketStatus('Connected'));
+      adminSocket.on('disconnect', () => setSocketStatus('Disconnected'));
+      adminSocket.on(
+        'connect_error',
+        (err) => setSocketStatus(`Failed: ${err.message}`)
+      );
 
-      return () => newSocket.disconnect();
-    } else if (socket) {
-      socket.disconnect();
+      return () => adminSocket.disconnect();
     }
-  }, [token, isAdmin, socket]);
+
+    // If not admin (or token changed away), tear down any existing socket
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      setSocketStatus('Disconnected');
+    }
+  }, [token, isAdmin]);
 
   return (
     <SocketContext.Provider value={{ socket, socketStatus }}>
@@ -40,3 +52,5 @@ export const SocketProvider = ({ children }) => {
     </SocketContext.Provider>
   );
 };
+
+export default SocketContext;

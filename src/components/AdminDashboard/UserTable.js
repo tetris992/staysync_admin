@@ -1,10 +1,11 @@
+// src/components/AdminDashboard/UserTable.jsx
 import React, { useState } from 'react';
 import UserTableRow from './UserTableRow';
 
 const UserTable = ({ users, updateStatus }) => {
   const [expandedHotelId, setExpandedHotelId] = useState(null);
 
-  if (!users || users.length === 0) {
+  if (!users.length) {
     return <p className="no-data-message">표시할 사용자가 없습니다.</p>;
   }
 
@@ -23,17 +24,13 @@ const UserTable = ({ users, updateStatus }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.map(user => (
             <UserTableRow
               key={user.hotelId}
               user={user}
               isExpanded={expandedHotelId === user.hotelId}
-              onToggleExpand={() =>
-                setExpandedHotelId((prev) =>
-                  prev === user.hotelId ? null : user.hotelId
-                )
-              }
-              updateStatus={updateStatus}   // ← 여기서 꼭 전달
+              onToggleExpand={() => setExpandedHotelId(prev => prev === user.hotelId ? null : user.hotelId)}
+              updateStatus={updateStatus}
             />
           ))}
         </tbody>

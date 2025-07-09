@@ -1,13 +1,9 @@
+// src/components/AdminDashboard/UserTableRow.jsx
 import React, { useState } from 'react';
 import SalesDetails from './SalesDetails';
 import '../../styles/UserTableRow.css';
 
-const UserTableRow = ({
-  user,
-  isExpanded,
-  onToggleExpand,
-  updateStatus,     // ← AdminDashboard → UserTable 에서 전달된 함수
-}) => {
+const UserTableRow = ({ user, isExpanded, onToggleExpand, updateStatus }) => {
   const [blinking, setBlinking] = useState(false);
   const [updating, setUpdating] = useState(false);
 
@@ -15,34 +11,21 @@ const UserTableRow = ({
     e.stopPropagation();
     if (updating) return;
     setUpdating(true);
-
-    // updateStatus가 함수인지 체크
-    if (typeof updateStatus !== 'function') {
-      console.error('updateStatus is not a function', updateStatus);
-      setUpdating(false);
-      return;
-    }
-
     const ok = await updateStatus(user.hotelId, status);
-
     if (ok) {
       setBlinking(true);
-      setTimeout(() => setBlinking(false), 2500); // 2.5초 깜빡임
+      setTimeout(() => setBlinking(false), 2500);
     }
-
     setUpdating(false);
   };
 
-  const formatDate = (dt) =>
-    dt ? new Date(dt).toLocaleDateString('ko-KR') : '-';
+  const formatDate = dt => dt ? new Date(dt).toLocaleDateString('ko-KR') : '-';
 
   return (
     <>
       <tr
         onClick={onToggleExpand}
-        className={`${isExpanded ? 'expanded' : ''} ${
-          blinking ? 'blink' : ''
-        }`}
+        className={`${isExpanded ? 'expanded' : ''} ${blinking ? 'blink' : ''}`}
         style={{ transition: 'background-color 0.3s ease' }}
       >
         <td>{user.hotelId}</td>
@@ -75,10 +58,7 @@ const UserTableRow = ({
       {isExpanded && (
         <tr className="expanded-details">
           <td colSpan="7">
-            <SalesDetails
-              hotelId={user.hotelId}
-              hotelName={user.hotelName}
-            />
+            <SalesDetails hotelId={user.hotelId} hotelName={user.hotelName} />
           </td>
         </tr>
       )}
