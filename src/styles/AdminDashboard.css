@@ -26,7 +26,7 @@
 }
 
 .socket-status {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #555;
   background-color: #f0f0f0;
   padding: 5px 10px;
@@ -43,14 +43,15 @@
 
 .filter-container label,
 .sales-filter label {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 500;
+  align-items: center;
 }
 
 .filter-container select,
 .sales-filter select {
   padding: 8px 12px;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   border-radius: 5px;
   border: 1px solid #ccc;
   cursor: pointer;
@@ -90,6 +91,7 @@ th {
 /* ⭐️ 호버 시 행 전체를 회색으로 변경 */
 .table-wrapper table tbody tr:not(.expanded-details):hover > td {
   background-color: #e0e0e0;
+  cursor: pointer;
 }
 
 tr.expanded {
@@ -147,7 +149,7 @@ tr.expanded-details td {
 }
 
 .action-button.suspend-button {
-  background-color: #cacaca;
+  background-color: #8d8c8c;
   color: #fff;
 }
 .action-button.suspend-button:hover {
