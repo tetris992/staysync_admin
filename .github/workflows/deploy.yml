@@ -5,6 +5,13 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -12,6 +19,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code 🛎️
         uses: actions/checkout@v4
@@ -25,11 +33,18 @@ jobs:
       - name: Install dependencies 📦
         run: npm ci
 
+      - name: Lint code ✨
+        run: npm run lint -- --max-warnings=0
+
       - name: Build application 🏗️
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
           PUBLIC_URL: /staysync_admin
         run: npm run build
+
+      # CNAME 파일 생성 (만약 GitHub Settings에서 이미 도메인을 설정했다면 생략 가능)
+      - name: Create CNAME file 🏷️
+        run: echo "ztoone.kr" > build/CNAME
 
       - name: Deploy to GitHub Pages 🚀
         if: github.ref == 'refs/heads/main'
@@ -38,14 +53,14 @@ jobs:
           folder: build
           branch: gh-pages
           clean: true
-          cname: ztoone.kr        # ← 이 줄을 반드시 넣으세요
 
       - name: Verify deployment ✅
         if: github.ref == 'refs/heads/main'
         run: |
+          echo "배포가 완료되었습니다: https://ztoone.kr/staysync_admin"
           sleep 10
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ztoone.kr/staysync_admin)
           if [ "$HTTP_STATUS" != "200" ]; then
-            echo "HTTP $HTTP_STATUS – 아직 반영되지 않았을 수 있습니다."
+            echo "⚠️ 배포 확인에 실패했습니다 (HTTP $HTTP_STATUS)."
             exit 1
           fi
