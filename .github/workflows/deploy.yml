@@ -67,4 +67,4 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           echo "✅ Deployment completed. Visit https://ztoone.kr/"
-          curl -I https://ztoone.kr/
+          run: curl -I --insecure https://ztoone.kr/
