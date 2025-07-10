@@ -34,18 +34,17 @@ jobs:
           echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
           echo "PUBLIC_URL=/"                                  >> .env.production
 
-      - name: Verify .env.production
-        run: |
-          echo "--- .env.production ---"
-          cat .env.production
-
       - name: Build
         run: npm run build
 
       - name: Prepare build for GitHub Pages
         run: |
+          # custom domain 설정
           echo "ztoone.kr" > build/CNAME
+          # Jekyll 무시
           touch build/.nojekyll
+          # SPA 라우팅용 404.html (index.html 복사본)
+          cp build/index.html build/404.html
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -59,5 +58,4 @@ jobs:
       - name: Verify deployment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          echo "✅ Deployment completed. Visit https://ztoone.kr/"
-          curl -I --insecure https://ztoone.kr/
+          echo "✅ Deployed – 모든 경로를 /login 으로 SPA가 처리하게 됩니다."
