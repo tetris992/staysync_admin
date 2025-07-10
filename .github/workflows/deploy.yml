@@ -1,6 +1,5 @@
 name: Deploy to GitHub Pages
 
-# GITHUB_TOKEN 에게 저장소 컨텐츠 쓰기 권한을 부여합니다.
 permissions:
   contents: write
 
@@ -30,9 +29,6 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      # ─────────────────────────────────────────────────
-      # 프로덕션 전용 .env 파일 생성 (.env.production)
-      # ─────────────────────────────────────────────────
       - name: Create .env.production
         run: |
           echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
@@ -46,9 +42,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # ─────────────────────────────────────────────────
-      # CNAME 과 nojekyll 파일을 build 폴더에 복사 (옵션)
-      # ─────────────────────────────────────────────────
       - name: Prepare build for GitHub Pages
         run: |
           echo "ztoone.kr" > build/CNAME
@@ -67,4 +60,4 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           echo "✅ Deployment completed. Visit https://ztoone.kr/"
-          run: curl -I --insecure https://ztoone.kr/
+          curl -I --insecure https://ztoone.kr/
