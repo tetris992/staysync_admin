@@ -1,8 +1,13 @@
 // Frontend: src/api/api.js
+// 개발자 대쉬보드 
+
 import axios from 'axios';
 import ApiError from '../utils/ApiError';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL =
+  process.env.REACT_APP_API_BASE_URL?.trim() ||
+  'https://staysync.org';
+
 const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
