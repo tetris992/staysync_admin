@@ -2,17 +2,28 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
+    <!-- 모바일 대응 뷰포트 설정 -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HMS Admin Dashboard</title>
+    <!-- 애플 터치 아이콘 (선택) -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!-- 파비콘 -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-
+    
+    <!-- 앱 제목 -->
+    <title>HMS Admin Dashboard</title>
+    
     <!-- CRA가 빌드 시 실제 CSS 경로로 교체합니다 -->
-    <link rel="stylesheet" href="%PUBLIC_URL%/static/css/main.[hash].css" />
+    <link
+      rel="stylesheet"
+      href="%PUBLIC_URL%/static/css/main.[hash].css"
+    />
   </head>
   <body>
+    <!-- JavaScript 비활성화 안내 -->
     <noscript>이 앱을 실행하려면 JavaScript를 활성화해야 합니다.</noscript>
+    <!-- React 마운트 포인트 -->
     <div id="root"></div>
-
+    
     <!-- CRA가 빌드 시 실제 JS 경로로 교체합니다 -->
     <script src="%PUBLIC_URL%/static/js/main.[hash].js"></script>
   </body>
