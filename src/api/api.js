@@ -1,7 +1,7 @@
 import axios from 'axios';
 import ApiError from '../utils/ApiError';
 
-// Base URL: 포트 3003 명시, 환경 변수 우선
+// Base URL: 포트 3003 명시, 환경 변수
 const BASE_URL =
   process.env.REACT_APP_API_BASE_URL?.trim() ||
   'https://staysync.org';
