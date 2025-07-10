@@ -65,8 +65,7 @@ jobs:
           folder: build
           branch: gh-pages
           clean: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          cname: ztoone.kr
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify deployment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
