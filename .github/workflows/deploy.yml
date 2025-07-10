@@ -6,11 +6,9 @@ permissions:
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -32,18 +30,33 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
+      # ─────────────────────────────────────────────────
+      # 프로덕션 전용 .env 파일 생성 (.env.production)
+      # ─────────────────────────────────────────────────
       - name: Create .env.production
         run: |
-          echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
-          echo "PUBLIC_URL=/staysync_admin"           >> .env.production
+          cat <<EOF > .env.production
+          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          PUBLIC_URL=/
+          EOF
 
       - name: Verify .env.production
         run: |
-          echo ">>> .env.production contents:"
+          echo "--- .env.production ---"
           cat .env.production
 
       - name: Build
         run: npm run build
+
+      # ─────────────────────────────────────────────────
+      # CNAME 과 nojekyll 파일을 build 폴더에 복사 (옵션)
+      # ─────────────────────────────────────────────────
+      - name: Prepare build for GitHub Pages
+        run: |
+          # custom domain 설정
+          echo "ztoone.kr" > build/CNAME
+          # Jekyll 무시
+          touch build/.nojekyll
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -53,9 +66,10 @@ jobs:
           branch: gh-pages
           clean: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          cname: ztoone.kr     # 커스텀 도메인 자동 생성
 
       - name: Verify deployment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          echo "Deployment completed. Verify at https://ztoone.kr/staysync_admin"
-          curl -I https://ztoone.kr/staysync_admin
+          echo "✅ Deployment completed. Visit https://ztoone.kr/"
+          curl -I https://ztoone.kr/
