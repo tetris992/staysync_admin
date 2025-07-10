@@ -51,9 +51,7 @@ jobs:
       # ─────────────────────────────────────────────────
       - name: Prepare build for GitHub Pages
         run: |
-          # custom domain 설정
           echo "ztoone.kr" > build/CNAME
-          # Jekyll 무시
           touch build/.nojekyll
 
       - name: Deploy to GitHub Pages
