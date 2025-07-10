@@ -1,5 +1,9 @@
 name: Deploy to GitHub Pages
 
+# GITHUB_TOKEN 에게 저장소 컨텐츠 쓰기 권한을 부여합니다.
+permissions:
+  contents: write
+
 on:
   push:
     branches:
