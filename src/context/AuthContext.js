@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   }, [verifyAuth]);
 
   const login = async (username, password) => {
-    const { data } = await api.post('/', { username, password }, { skipCsrf: true });
+    const { data } = await api.post('/api/admin/login', { username, password }, { skipCsrf: true });
     if (data.accessToken) {
       localStorage.setItem('accessToken', data.accessToken);
       setToken(data.accessToken);
