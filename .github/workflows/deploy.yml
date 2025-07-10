@@ -29,25 +29,19 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      - name: Create .env.production
-        run: |
-          echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
-          echo "PUBLIC_URL=/"                                  >> .env.production
-
       - name: Build
+        env:
+          REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
+          PUBLIC_URL: /
         run: npm run build
 
       - name: Prepare build for GitHub Pages
         run: |
-          # custom domain 설정
           echo "ztoone.kr" > build/CNAME
-          # Jekyll 무시
           touch build/.nojekyll
-          # SPA 라우팅용 404.html (index.html 복사본)
           cp build/index.html build/404.html
 
       - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: build
@@ -55,7 +49,5 @@ jobs:
           clean: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Verify deployment
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          echo "✅ Deployed – 모든 경로를 /login 으로 SPA가 처리하게 됩니다."
+      - name: Confirm deployment
+        run: echo "✅ Deployed – 모든 경로를 /login 으로 SPA가 처리합니다."
