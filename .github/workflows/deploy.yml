@@ -28,9 +28,6 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      # ──────────────────────────────────────────────────────────────────────
-      # 프로덕션 전용 .env 파일을 CI에서 생성
-      # ──────────────────────────────────────────────────────────────────────
       - name: Create .env.production
         run: |
           echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
@@ -51,6 +48,7 @@ jobs:
           folder: build
           branch: gh-pages
           clean: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify deployment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
