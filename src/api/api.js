@@ -1,10 +1,10 @@
 import axios from 'axios';
 import ApiError from '../utils/ApiError';
 
-// Base URL: 포트 3003 명시, 환경 변수
+// Base URL
 const BASE_URL =
   process.env.REACT_APP_API_BASE_URL?.trim() ||
-  'https://staysync.org';
+  'https://staysync.org';  //이건 백앤드 도메인
 
 const api = axios.create({
   baseURL: BASE_URL,
