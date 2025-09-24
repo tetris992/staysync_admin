@@ -1,6 +1,7 @@
 {
   "name": "hms-admin-dashboard",
   "version": "1.0.0",
+  "homepage": "https://ztoone.kr",
   "private": true,
   "dependencies": {
     "axios": "^1.7.2",
@@ -19,7 +20,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext .js,.jsx"
+    "lint": "eslint src --ext .js,.jsx",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -42,5 +45,8 @@
   "overrides": {
     "nth-check": "^2.0.1",
     "postcss": "^8.4.31"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
   }
 }
