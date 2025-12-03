@@ -1,0 +1,238 @@
+/* src/styles/SalesDetails.css */
+
+.sales-details-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.sales-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sales-details-header h4 {
+  margin: 0;
+  color: #1a237e;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Month Picker */
+.month-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
+}
+
+.month-picker .nav-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #555;
+  font-weight: bold;
+}
+
+.month-picker .current-date {
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 130px;
+  justify-content: center;
+  color: #333;
+}
+
+.refresh-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #1a237e;
+  margin-left: 8px;
+}
+
+/* Grid Layout */
+.sales-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card.full-width {
+  grid-column: span 2;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #444;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #f4f4f4;
+  padding-bottom: 10px;
+}
+
+/* Revenue Card */
+.revenue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.revenue-row .label { font-size: 0.95rem; color: #666; }
+.revenue-row .value { font-size: 1.4rem; font-weight: 700; color: #333; }
+.revenue-row .value.main { color: #1a237e; }
+.revenue-row .value.highlight { color: #e91e63; }
+.revenue-row.sub { margin-left: 15px; border-left: 3px solid #eee; padding-left: 10px; }
+.revenue-row.sub .value { font-size: 1.1rem; }
+
+.revenue-info {
+  margin-top: auto;
+  font-size: 0.85rem;
+  color: #888;
+  background: #f9f9f9;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* Billing Card */
+.billing-breakdown {
+  font-size: 0.9rem;
+}
+
+.billing-breakdown .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.billing-breakdown .row.discount {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-top: -4px;
+  margin-bottom: 10px;
+}
+
+.strike-through {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.divider {
+  margin: 15px 0;
+  border: 0;
+  border-top: 1px dashed #ddd;
+}
+
+.billing-breakdown .row.vat {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.total-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f0f2ff;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #1a237e;
+}
+
+.total-display .amount {
+  font-size: 1.5rem;
+}
+
+.billing-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.paid { background-color: #e8f5e9; color: #2e7d32; }
+.status-badge.unpaid { background-color: #ffebee; color: #c62828; }
+
+.invoice-btn {
+  background-color: #1a237e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.invoice-btn:hover { background-color: #0d124d; }
+
+/* Detail Table */
+.table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.details-table th, .details-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.details-table th {
+  background-color: #fafafa;
+  color: #555;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.details-table tr:hover { background-color: #f9f9f9; }
+.details-table td.right { text-align: right; }
+.details-table td.center { text-align: center; }
+
+@media (max-width: 768px) {
+  .sales-dashboard-grid { grid-template-columns: 1fr; }
+  .card.full-width { grid-column: span 1; }
+}

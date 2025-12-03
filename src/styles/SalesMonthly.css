@@ -1,33 +1,165 @@
-/* src/components/AdminDashboard/SalesMonthly.css */
-.sales-monthly {
-  padding: 1rem;
-  background: #fff;
+.sales-details-container {
+  padding: 20px;
+  background-color: #f8f9fa;
   border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
-.sales-title {
-  font-size: 1.25rem;
-  margin-bottom: .75rem;
-  font-weight: bold;
+
+.sales-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
-.sales-header {
+
+.sales-details-header h4 {
+  margin: 0;
+  color: #1a237e;
+  font-weight: 700;
+}
+
+.month-picker {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
+  gap: 10px;
+  background: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.sales-header button {
-  background: none;
+
+.month-picker .nav-btn {
   border: none;
-  font-size: 1rem;
+  background: none;
   cursor: pointer;
+  color: #666;
+  font-weight: bold;
 }
-.sales-month {
-  margin: 0 1rem;
+
+.month-picker .current-date {
+  font-weight: 600;
   font-size: 1rem;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 120px;
+  justify-content: center;
 }
-.no-data {
-  text-align: center;
+
+.refresh-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #1a237e;
+  margin-left: 10px;
+}
+
+.sales-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.card-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.card-amount.highlight {
+  color: #1a237e;
+}
+
+.card-desc {
+  font-size: 0.8rem;
   color: #888;
-  margin-top: 2rem;
+}
+
+/* Billing Card Specifics */
+.billing-breakdown {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #eee;
+  font-size: 0.9rem;
+}
+
+.billing-breakdown .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.billing-breakdown .row.vat {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.billing-actions {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.paid {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.unpaid {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.invoice-btn {
+  background-color: #1a237e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.invoice-btn:hover {
+  background-color: #0d124d;
+}
+
+@media (max-width: 768px) {
+  .sales-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }

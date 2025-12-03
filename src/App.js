@@ -1,6 +1,6 @@
-// src/App.jsx
+// src/App.js
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'; // BrowserRouter → HashRouter
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,15 +12,11 @@ import ProtectedRoute from './Auth/ProtectedRoute';
 
 export default function App() {
   return (
-    // 루트 호스팅이므로 basename은 생략합니다.
-    <BrowserRouter>
+    <HashRouter> {/* HashRouter로 변경 */}
       <AuthProvider>
         <SocketProvider>
           <Routes>
-            {/* 로그인 화면 */}
             <Route path="/login" element={<AdminLogin />} />
-
-            {/* 보호된 대시보드 */}
             <Route
               path="/"
               element={
@@ -29,12 +25,9 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* 그 외 모든 경로는 루트로 리다이렉트 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
 
-          {/* 전역 Toast 알림 */}
           <ToastContainer
             position="top-center"
             autoClose={3000}
@@ -48,6 +41,6 @@ export default function App() {
           />
         </SocketProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
