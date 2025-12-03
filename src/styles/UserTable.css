@@ -1,33 +1,158 @@
-/* src/styles/UserTable.css */
-.table-wrapper {
+/* src/styles/UserTable.css - Full Replacement */
+
+/* =========================================
+   1. 전체 레이아웃 (7:3 분할 + 최소 너비 보장)
+   ========================================= */
+.split-layout-container {
+  display: flex;
   width: 100%;
-  overflow-x: auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 120px); /* 헤더 제외 높이 꽉 채우기 (필요시 조정) */
+  gap: 20px;
+  background-color: #f5f5f7;
+  
+  /* ⭐️ [중요] 화면이 작아져도 패널들이 찌그러지지 않도록 전체 최소 너비 설정 */
+  /* 왼쪽 최소(약 400px) + 오른쪽 고정(500px) + 간격 = 약 1000px */
+  min-width: 1000px; 
+  overflow-x: auto; /* 창이 너무 작으면 전체 가로 스크롤 발생 */
+  padding-bottom: 20px; /* 하단 스크롤바와 겹치지 않게 여백 */
 }
 
-table {
+/* 패널 공통 스타일 */
+.panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 패널 밖으로 내용 넘침 방지 */
+}
+
+/* -----------------------------------------
+   [Left Panel] 호텔 목록 (유동적 너비)
+   ----------------------------------------- */
+.panel.left-panel {
+  flex: 1; /* 남은 공간 모두 차지 (오른쪽 패널 제외한 나머지) */
+  min-width: 400px; /* 왼쪽 패널도 너무 작아지지 않게 최소한의 방어 */
+  border-right: 1px solid #e0e0e0;
+}
+
+/* 테이블 스크롤 영역 (패널 내부) */
+.table-scroll-wrapper {
+  flex: 1;
+  overflow: auto; /* 가로/세로 스크롤 모두 허용 */
+}
+
+/* 테이블 스타일 */
+.full-info-table {
   width: 100%;
-  border-collapse: separate;
+  min-width: 800px; /* 컬럼이 많으므로 테이블 자체의 최소 폭 유지 */
+  border-collapse: separate; /* Sticky Header/Column 작동을 위해 필수 */
   border-spacing: 0;
 }
 
-th, td {
-  padding: 12px 15px;
-  text-align: left;
+/* 헤더 및 셀 공통 */
+.full-info-table th, 
+.full-info-table td {
+  padding: 14px 12px;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  border-bottom: 1px solid #f0f0f0;
   font-size: 0.9rem;
-  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+  text-align: left;
 }
 
-th {
-  background-color: #f5f5f5;
+/* 헤더 고정 (Sticky Header) */
+.full-info-table th {
+  background-color: #f8f9fa;
   font-weight: 600;
   color: #1a237e;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
+  border-bottom: 2px solid #e0e0e0;
 }
+
+/* ⭐️ [중요] 첫 번째 컬럼(ID) 고정 */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background-color: #fff;
+  z-index: 5;
+  border-right: 1px solid #f0f0f0;
+  min-width: 90px;
+}
+
+/* ⭐️ [중요] 두 번째 컬럼(호텔명) 고정 */
+.sticky-col-2 {
+  position: sticky;
+  left: 90px; /* 앞 컬럼 너비만큼 띄움 (값 조정 필요시 변경) */
+  background-color: #fff;
+  z-index: 5;
+  border-right: 1px solid #f0f0f0;
+  min-width: 140px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 헤더에 있는 Sticky 컬럼은 z-index가 더 높아야 함 */
+.full-info-table th.sticky-col,
+.full-info-table th.sticky-col-2 {
+  background-color: #f8f9fa;
+  z-index: 11;
+}
+
+/* 행 선택 및 호버 효과 */
+.full-info-table tbody tr {
+  transition: background-color 0.1s;
+  cursor: pointer;
+}
+
+.full-info-table tbody tr:hover td {
+  background-color: #f9f9f9;
+}
+
+/* 선택된 행 스타일 (오른쪽 패널에 표시 중인 호텔) */
+.selected-row td {
+  background-color: #e8eaf6 !important; /* 연한 남색 배경 */
+  color: #1a237e;
+  font-weight: 500;
+}
+/* 선택된 행의 Sticky 컬럼도 배경색 맞춰줌 */
+.selected-row .sticky-col,
+.selected-row .sticky-col-2 {
+  background-color: #e8eaf6 !important;
+}
+
+/* -----------------------------------------
+   [Right Panel] 상세 정보 (고정 너비 보장)
+   ----------------------------------------- */
+.panel.right-panel {
+  /* ⭐️ 늘어나지도(flex-grow: 0), 줄어들지도(flex-shrink: 0) 않고 500px 고정 */
+  flex: 0 0 500px; 
+  min-width: 500px; /* 확실한 최소 너비 보장 */
+  
+  background-color: #fff;
+  overflow-y: auto; /* 내용 길면 세로 스크롤 */
+  border-left: 1px solid #e9ecef;
+}
+
+/* 우측 패널 빈 상태 (선택된 호텔 없음) */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1rem;
+}
+
+/* -----------------------------------------
+   기타 스타일 (상태 램프, 텍스트, 버튼)
+   ----------------------------------------- */
 
 /* 상태 램프 */
 .status-lamp {
@@ -39,38 +164,44 @@ th {
   vertical-align: middle;
 }
 .status-lamp.on  { background-color: #4caf50; }
-.status-lamp.off { background-color: #f44336; }
+.status-lamp.off { background-color: #e0e0e0; }
 
 /* 상태 텍스트 색상 */
-.status-text.active   { color: #4caf50; font-weight: bold; }
-.status-text.inactive { color: #f44336; font-weight: bold; }
+.status-text.active   { color: #2e7d32; font-weight: bold; }
+.status-text.inactive { color: #c62828; font-weight: bold; }
 .status-text.pending  { color: #ff9800; font-weight: bold; }
 
-/* 버튼 스타일 (기존 AdminDashboard.css 와 동일) */
+.center-align { text-align: center; }
+
+/* 버튼 스타일 */
 .action-button {
   padding: 6px 12px;
-  margin: 0 5px;
+  margin: 0 2px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   transition: background-color 0.2s, transform 0.1s;
 }
 .action-button:hover {
   transform: translateY(-1px);
 }
+
 .approve-button {
-  background-color: #4caf50;
-  color: #fff;
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 .approve-button:hover {
-  background-color: #45a049;
+  background-color: #c8e6c9;
 }
+
 .suspend-button {
-  background-color: #cacaca;
-  color: #fff;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
 }
 .suspend-button:hover {
-  background-color: #d32f2f;
+  background-color: #e0e0e0;
+  color: #333;
 }

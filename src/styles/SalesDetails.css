@@ -1,36 +1,43 @@
 /* src/styles/SalesDetails.css */
 
+/* 30% 좁은 영역에 맞춘 스타일 최적화 
+   Grid -> Flex Column 변경 
+*/
+
 .sales-details-container {
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  padding: 15px; /* 여백 축소 */
+  background-color: transparent;
 }
 
+/* --- [헤더 영역] --- */
 .sales-details-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* 좁으니 수직 정렬 */
+  align-items: flex-start;
+  gap: 12px;
   margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
 }
 
 .sales-details-header h4 {
   margin: 0;
   color: #1a237e;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
-/* Month Picker */
+/* 월 선택기 (꽉 차게) */
 .month-picker {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: white;
-  padding: 6px 16px;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid #ddd;
+  justify-content: space-between;
+  width: 100%;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-sizing: border-box; /* 패딩 포함 */
 }
 
 .month-picker .nav-btn {
@@ -38,17 +45,13 @@
   background: none;
   cursor: pointer;
   color: #555;
-  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0 10px;
 }
 
 .month-picker .current-date {
   font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 130px;
-  justify-content: center;
+  font-size: 0.95rem;
   color: #333;
 }
 
@@ -57,152 +60,138 @@
   background: none;
   cursor: pointer;
   color: #1a237e;
-  margin-left: 8px;
 }
 
-/* Grid Layout */
+/* --- [레이아웃: 수직 스택] --- */
 .sales-dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  display: flex;       /* Grid 제거하고 Flex 사용 */
+  flex-direction: column; /* 무조건 세로 배치 */
+  gap: 15px;
 }
 
+/* 공통 카드 스타일 */
 .card {
   background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  border: 1px solid #f0f0f0;
+  padding: 16px; /* 내부 여백 축소 */
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  border: 1px solid #eee;
   display: flex;
   flex-direction: column;
-}
-
-.card.full-width {
-  grid-column: span 2;
 }
 
 .card-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #444;
-  font-size: 1rem;
+  color: #555;
+  font-size: 0.9rem;
   font-weight: 700;
-  margin-bottom: 16px;
-  border-bottom: 2px solid #f4f4f4;
-  padding-bottom: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f4f4f4;
 }
 
-/* Revenue Card */
+/* --- [매출 카드] --- */
 .revenue-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-.revenue-row .label { font-size: 0.95rem; color: #666; }
-.revenue-row .value { font-size: 1.4rem; font-weight: 700; color: #333; }
+.revenue-row .label { font-size: 0.9rem; color: #666; }
+.revenue-row .value { font-size: 1.25rem; font-weight: 700; color: #333; }
 .revenue-row .value.main { color: #1a237e; }
 .revenue-row .value.highlight { color: #e91e63; }
-.revenue-row.sub { margin-left: 15px; border-left: 3px solid #eee; padding-left: 10px; }
-.revenue-row.sub .value { font-size: 1.1rem; }
+
+.revenue-row.sub { 
+  margin-left: 0; 
+  background-color: #fafafa; 
+  padding: 8px; 
+  border-radius: 6px; 
+  margin-bottom: 10px;
+}
+.revenue-row.sub .value { font-size: 1rem; }
 
 .revenue-info {
-  margin-top: auto;
-  font-size: 0.85rem;
+  margin-top: 5px;
+  font-size: 0.8rem;
   color: #888;
-  background: #f9f9f9;
-  padding: 8px;
-  border-radius: 6px;
+  line-height: 1.4;
 }
 
-/* Billing Card */
+/* --- [청구서 카드] --- */
 .billing-breakdown {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .billing-breakdown .row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: #555;
 }
 
 .billing-breakdown .row.discount {
   color: #d32f2f;
-  font-size: 0.85rem;
-  margin-top: -4px;
-  margin-bottom: 10px;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
 }
 
-.strike-through {
-  text-decoration: line-through;
-  color: #aaa;
-}
-
-.divider {
-  margin: 15px 0;
-  border: 0;
-  border-top: 1px dashed #ddd;
-}
-
-.billing-breakdown .row.vat {
-  color: #888;
-  font-size: 0.85rem;
-}
+.strike-through { text-decoration: line-through; color: #aaa; }
+.divider { margin: 12px 0; border: 0; border-top: 1px dashed #ddd; }
+.billing-breakdown .row.vat { color: #888; }
 
 .total-display {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 15px;
-  padding: 15px;
+  margin-top: 12px;
+  padding: 12px;
   background-color: #f0f2ff;
   border-radius: 8px;
-  font-weight: 700;
   color: #1a237e;
 }
-
-.total-display .amount {
-  font-size: 1.5rem;
-}
+.total-display .amount { font-size: 1.3rem; font-weight: 800; }
 
 .billing-actions {
-  margin-top: 20px;
+  margin-top: 15px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* 버튼들을 세로로 쌓거나 꽉 차게 */
+  gap: 10px;
 }
 
 .status-badge {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  border-radius: 20px;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
 }
-
 .status-badge.paid { background-color: #e8f5e9; color: #2e7d32; }
 .status-badge.unpaid { background-color: #ffebee; color: #c62828; }
 
 .invoice-btn {
+  width: 100%;
   background-color: #1a237e;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 0;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .invoice-btn:hover { background-color: #0d124d; }
 
-/* Detail Table */
+/* --- [테이블 카드 (상세 내역)] --- */
 .table-container {
-  max-height: 300px;
+  max-height: 550px;
   overflow-y: auto;
   border: 1px solid #eee;
   border-radius: 6px;
@@ -211,28 +200,22 @@
 .details-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* 좁으니 폰트 작게 */
 }
 
 .details-table th, .details-table td {
-  padding: 10px;
+  padding: 8px;
   text-align: left;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .details-table th {
   background-color: #fafafa;
-  color: #555;
+  color: #666;
   font-weight: 600;
   position: sticky;
   top: 0;
 }
 
-.details-table tr:hover { background-color: #f9f9f9; }
 .details-table td.right { text-align: right; }
 .details-table td.center { text-align: center; }
-
-@media (max-width: 768px) {
-  .sales-dashboard-grid { grid-template-columns: 1fr; }
-  .card.full-width { grid-column: span 1; }
-}
