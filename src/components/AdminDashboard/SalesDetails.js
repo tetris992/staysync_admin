@@ -11,7 +11,6 @@ import {
   FaSync,
   FaCheckCircle,
   FaTimesCircle,
-  FaBed,
   FaList,
   FaPaperPlane // 아이콘 추가
 } from 'react-icons/fa';
