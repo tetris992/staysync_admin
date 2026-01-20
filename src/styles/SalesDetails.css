@@ -1,23 +1,28 @@
 /* src/styles/SalesDetails.css */
+/* ✅ [개선] 스크롤바 1개로 통합 */
 
-/* 30% 좁은 영역에 맞춘 스타일 최적화 
-   Grid -> Flex Column 변경 
-*/
-
+/* =========================================
+   1. 기본 레이아웃 (스크롤 최적화)
+   ========================================= */
 .sales-details-container {
-  padding: 15px; /* 여백 축소 */
+  padding: 15px;
   background-color: transparent;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ✅ 최상위 스크롤 방지 */
 }
 
 /* --- [헤더 영역] --- */
 .sales-details-header {
   display: flex;
-  flex-direction: column; /* 좁으니 수직 정렬 */
+  flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
+  flex-shrink: 0;
 }
 
 .sales-details-header h4 {
@@ -27,7 +32,7 @@
   font-size: 1.1rem;
 }
 
-/* 월 선택기 (꽉 차게) */
+/* 월 선택기 */
 .month-picker {
   display: flex;
   align-items: center;
@@ -37,7 +42,7 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid #eee;
-  box-sizing: border-box; /* 패딩 포함 */
+  box-sizing: border-box;
 }
 
 .month-picker .nav-btn {
@@ -60,24 +65,30 @@
   background: none;
   cursor: pointer;
   color: #1a237e;
+  display: flex;
+  align-items: center;
 }
 
-/* --- [레이아웃: 수직 스택] --- */
+/* --- [메인 그리드: 수직 스택] --- */
 .sales-dashboard-grid {
-  display: flex;       /* Grid 제거하고 Flex 사용 */
-  flex-direction: column; /* 무조건 세로 배치 */
+  display: flex;
+  flex-direction: column;
   gap: 15px;
+  overflow-y: auto; /* ✅ 여기만 스크롤 */
+  padding-right: 4px;
+  flex: 1; /* ✅ 남은 공간 모두 차지 */
 }
 
 /* 공통 카드 스타일 */
 .card {
   background: white;
-  padding: 16px; /* 내부 여백 축소 */
+  padding: 16px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
   border: 1px solid #eee;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .card-title {
@@ -90,6 +101,7 @@
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f4f4f4;
+  justify-content: space-between;
 }
 
 /* --- [매출 카드] --- */
@@ -108,7 +120,7 @@
 .revenue-row.sub { 
   margin-left: 0; 
   background-color: #fafafa; 
-  padding: 8px; 
+  padding: 10px; 
   border-radius: 6px; 
   margin-bottom: 10px;
 }
@@ -119,9 +131,49 @@
   font-size: 0.8rem;
   color: #888;
   line-height: 1.4;
+  text-align: right;
 }
 
-/* --- [청구서 카드] --- */
+/* --- [청구서 카드 & 스마트 기능] --- */
+
+/* 1. 상태 배지 (헤더용 소형) */
+.status-badge-sm {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-badge-sm.paid { background-color: #e8f5e9; color: #2e7d32; }
+.status-badge-sm.sent { background-color: #fff3e0; color: #ef6c00; }
+.status-badge-sm.draft { background-color: #f5f5f5; color: #757575; }
+
+/* 2. 경고/알림 박스 */
+.alert-box {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  align-items: flex-start;
+}
+.alert-box strong { display: block; margin-bottom: 2px; }
+.alert-box p { margin: 0; }
+
+.alert-box.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+.alert-box.warning {
+  background-color: #fff8e1;
+  color: #f57f17;
+  border: 1px solid #ffe082;
+}
+
+/* 3. 청구 내역 텍스트 */
 .billing-breakdown {
   font-size: 0.85rem;
 }
@@ -137,11 +189,11 @@
   color: #d32f2f;
   font-size: 0.8rem;
   margin-bottom: 8px;
+  padding-left: 8px;
 }
 
 .strike-through { text-decoration: line-through; color: #aaa; }
 .divider { margin: 12px 0; border: 0; border-top: 1px dashed #ddd; }
-.billing-breakdown .row.vat { color: #888; }
 
 .total-display {
   display: flex;
@@ -153,46 +205,76 @@
   border-radius: 8px;
   color: #1a237e;
 }
-.total-display .amount { font-size: 1.3rem; font-weight: 800; }
+.total-display .amount { font-size: 1.2rem; font-weight: 800; }
 
-.billing-actions {
+/* 4. 액션 버튼 그룹 (수직 스택) */
+.billing-actions-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 15px;
-  display: flex;
-  flex-direction: column; /* 버튼들을 세로로 쌓거나 꽉 차게 */
-  gap: 10px;
 }
 
-.status-badge {
-  display: flex;
-  justify-content: center;
+.action-btn {
   width: 100%;
-  padding: 8px 0;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-.status-badge.paid { background-color: #e8f5e9; color: #2e7d32; }
-.status-badge.unpaid { background-color: #ffebee; color: #c62828; }
-
-.invoice-btn {
-  width: 100%;
-  background-color: #1a237e;
-  color: white;
+  padding: 10px;
   border: none;
-  padding: 10px 0;
   border-radius: 6px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
 }
-.invoice-btn:hover { background-color: #0d124d; }
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* 버튼 색상 테마 */
+.action-btn.primary { background-color: #1a237e; color: white; }
+.action-btn.primary:hover:not(:disabled) { background-color: #0d124d; }
+.action-btn.primary.alert { 
+  background-color: #d32f2f; 
+  animation: pulse 2s infinite; 
+}
+
+.action-btn.success { background-color: #4caf50; color: white; }
+.action-btn.success:hover:not(:disabled) { background-color: #388e3c; }
+
+.action-btn.secondary { 
+  background-color: #f5f5f5; 
+  color: #616161; 
+  border: 1px solid #e0e0e0; 
+}
+.action-btn.secondary:hover:not(:disabled) { background-color: #eeeeee; }
+
+.action-btn.danger.outline { 
+  background-color: transparent; 
+  border: 1px solid #ef9a9a; 
+  color: #c62828; 
+}
+.action-btn.danger.outline:hover:not(:disabled) { background-color: #ffebee; }
+
+/* 5. 히스토리 링크 */
+.history-link {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.history-link:hover { color: #1a237e; text-decoration: underline; }
+
 
 /* --- [테이블 카드 (상세 내역)] --- */
 .table-container {
-  max-height: 550px;
-  overflow-y: auto;
+  max-height: 300px; /* ✅ 높이 제한 줄임 */
+  overflow-y: auto; /* ✅ 테이블 내부 스크롤 */
   border: 1px solid #eee;
   border-radius: 6px;
 }
@@ -200,11 +282,11 @@
 .details-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem; /* 좁으니 폰트 작게 */
+  font-size: 0.75rem;
 }
 
 .details-table th, .details-table td {
-  padding: 8px;
+  padding: 8px 6px;
   text-align: left;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -215,7 +297,101 @@
   font-weight: 600;
   position: sticky;
   top: 0;
+  white-space: nowrap;
+  z-index: 1; /* ✅ 헤더가 위에 표시 */
 }
 
 .details-table td.right { text-align: right; }
 .details-table td.center { text-align: center; }
+
+
+/* =========================================
+   2. 모달 (화면 전체 덮기)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 450px;
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.modal-header h3 { margin: 0; color: #333; font-size: 1.1rem; }
+.close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999; }
+
+/* 히스토리 리스트 스타일 */
+.history-list { display: flex; flex-direction: column; gap: 15px; }
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #eee;
+}
+.history-item:last-child { border-bottom: none; }
+
+.history-icon { font-size: 1.2rem; margin-top: 2px; }
+.history-info { flex: 1; }
+.history-title { font-weight: bold; font-size: 0.9rem; color: #333; margin-bottom: 2px; }
+.history-meta { font-size: 0.75rem; color: #999; }
+.history-note { 
+  background: #f5f5f5; 
+  padding: 4px 8px; 
+  border-radius: 4px; 
+  font-size: 0.8rem; 
+  margin-top: 6px; 
+  color: #666; 
+}
+.history-amount { font-weight: bold; color: #1a237e; font-size: 0.9rem; align-self: flex-start; }
+
+/* 애니메이션 */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+}
+
+/* ✅ [추가] 스크롤바 스타일링 */
+.sales-dashboard-grid::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sales-dashboard-grid::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.sales-dashboard-grid::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.sales-dashboard-grid::-webkit-scrollbar-thumb:hover,
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

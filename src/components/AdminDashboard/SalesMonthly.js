@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { format, subMonths, addMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { subMonths, addMonths, format } from 'date-fns';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useHotelSales } from '../../hooks/useHotelSales';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -21,11 +21,11 @@ const SalesMonthly = ({ hotelId, hotelName }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const { salesData, isLoading, error, getSales } = useHotelSales(hotelId);
 
-  // 매월 1일 ~ 말일 조회
+  // ✅ [수정] year, month 파라미터로 변경
   useEffect(() => {
-    const startDate = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
-    const endDate   = format(endOfMonth(currentMonth),   'yyyy-MM-dd');
-    getSales('monthly', startDate, endDate);
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth() + 1;
+    getSales(year, month);
   }, [currentMonth, getSales]);
 
   const data = salesData?.byMonth || [];

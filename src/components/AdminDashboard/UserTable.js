@@ -103,6 +103,7 @@ const UserTable = ({ users, updateStatus }) => {
           <SalesDetails
             hotelId={selectedUser.hotelId}
             hotelName={selectedUser.hotelName}
+            approvalDate={selectedUser.createdAt} // ✅ 승인일 전달
           />
         ) : (
           <div className="empty-state">
