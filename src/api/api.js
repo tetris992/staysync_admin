@@ -383,4 +383,89 @@ export const updateNoticeAPI = async (id, noticeData) => {
   }
 };
 
+// ✅ FAQ 관리 API (Dev Dashboard)
+export const fetchFaqsAPI = async (page = 1, search = '', limit = 500, category = '') => {
+  try {
+    const response = await api.get('/api/faqs', { params: { page, search, limit, category } });
+    return response.data;
+  } catch (err) {
+    console.error('Fetch faqs error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || 'FAQ 목록 조회 실패');
+  }
+};
+
+export const createFaqAPI = async (faqData) => {
+  try {
+    const response = await api.post('/api/faqs', faqData);
+    return response.data;
+  } catch (err) {
+    console.error('Create faq error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || 'FAQ 등록 실패');
+  }
+};
+
+export const updateFaqAPI = async (id, faqData) => {
+  try {
+    // ✅ PATCH 권장 (백엔드가 PUT만 받으면 PUT로 바꾸면 됨)
+    const response = await api.patch(`/api/faqs/${id}`, faqData);
+    return response.data;
+  } catch (err) {
+    console.error('Update faq error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || 'FAQ 수정 실패');
+  }
+};
+
+export const deleteFaqAPI = async (id) => {
+  try {
+    const response = await api.delete(`/api/faqs/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error('Delete faq error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || 'FAQ 삭제 실패');
+  }
+};
+
+
+// ✅ 서비스 안내 관리 API (Dev Dashboard)
+export const fetchServiceGuidesAPI = async (page = 1, search = '', limit = 500, category = '') => {
+  try {
+    const response = await api.get('/api/service-guides', { params: { page, search, limit, category } });
+    return response.data;
+  } catch (err) {
+    console.error('Fetch service guides error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || '서비스 안내 목록 조회 실패');
+  }
+};
+
+export const createServiceGuideAPI = async (guideData) => {
+  try {
+    const response = await api.post('/api/service-guides', guideData);
+    return response.data;
+  } catch (err) {
+    console.error('Create service guide error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || '서비스 안내 등록 실패');
+  }
+};
+
+export const updateServiceGuideAPI = async (id, guideData) => {
+  try {
+    const response = await api.patch(`/api/service-guides/${id}`, guideData);
+    return response.data;
+  } catch (err) {
+    console.error('Update service guide error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || '서비스 안내 수정 실패');
+  }
+};
+
+export const deleteServiceGuideAPI = async (id) => {
+  try {
+    const response = await api.delete(`/api/service-guides/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error('Delete service guide error:', err);
+    throw new ApiError(err.response?.status || 500, err.response?.data?.message || '서비스 안내 삭제 실패');
+  }
+};
+
+
 export default api;
