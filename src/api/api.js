@@ -330,4 +330,57 @@ export const fetchHotelSales = async (hotelId, type, startDate, endDate) => {
   }
 };
 
+// ======================================================================
+// 📢 공지사항 관리 API (Admin 전용)
+// ======================================================================
+
+/**
+ * 1. 공지사항 목록 조회
+ */
+export const fetchNoticesAPI = async () => {
+  try {
+    const response = await api.get('/api/notices'); // 백엔드 라우트 경로 확인 필요
+    return response.data;
+  } catch (err) {
+    console.error('Fetch notices error:', err);
+    throw new ApiError(err.response?.status || 500, '공지 목록 조회 실패');
+  }
+};
+
+/**
+ * 2. 공지사항 등록
+ */
+export const createNoticeAPI = async (noticeData) => {
+  try {
+    const response = await api.post('/api/notices', noticeData);
+    return response.data;
+  } catch (err) {
+    console.error('Create notice error:', err);
+    throw new ApiError(err.response?.status || 500, '공지 등록 실패');
+  }
+};
+
+/**
+ * 3. 공지사항 삭제
+ */
+export const deleteNoticeAPI = async (id) => {
+  try {
+    const response = await api.delete(`/api/notices/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error('Delete notice error:', err);
+    throw new ApiError(err.response?.status || 500, '공지 삭제 실패');
+  }
+};
+
+export const updateNoticeAPI = async (id, noticeData) => {
+  try {
+    const response = await api.put(`/api/notices/${id}`, noticeData);
+    return response.data;
+  } catch (err) {
+    console.error('Update notice error:', err);
+    throw new ApiError(err.response?.status || 500, '공지 수정 실패');
+  }
+};
+
 export default api;
