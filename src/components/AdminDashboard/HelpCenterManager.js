@@ -10,13 +10,15 @@ const HelpCenterManager = () => {
     <button
       onClick={() => setTab(key)}
       style={{
-        padding: '10px 12px',
+        padding: '13px 16px',          // 기존 대비 약 30% 업
         borderRadius: 999,
         border: '1px solid #e5e7eb',
         background: tab === key ? '#111827' : '#fff',
         color: tab === key ? '#fff' : '#111827',
-        fontWeight: 700,
+        fontWeight: 800,
         cursor: 'pointer',
+        fontSize: '1.15rem',           // ✅ 폰트 업
+        letterSpacing: '0.1px',
       }}
     >
       {label}
@@ -24,8 +26,18 @@ const HelpCenterManager = () => {
   );
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <div style={{ display: 'flex', gap: 10, padding: 16, borderBottom: '1px solid #e5e7eb', background: '#fff' }}>
+    <div style={{ width: '100%', height: '100%', fontFamily: 'Pretendard, sans-serif' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          padding: 18,
+          borderBottom: '1px solid #e5e7eb',
+          background: '#fff',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
         {tabBtn('notice', '공지사항')}
         {tabBtn('faq', '자주 묻는 질문')}
         {tabBtn('guide', '서비스 안내')}

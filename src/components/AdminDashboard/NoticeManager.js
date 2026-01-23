@@ -17,6 +17,21 @@ import {
 } from 'react-icons/fa';
 
 const NoticeManager = () => {
+  // ✅ 폰트/가독성 스케일 (대략 +30%)
+  const FS = {
+    h2: '1.6rem',
+    label: '1.15rem',
+    input: '1.25rem',
+    btn: '1.3rem',
+    typeBtn: '1.15rem',
+    pinLabel: '1.25rem',
+    badge: '0.9rem',
+    title: '1.3rem',
+    preview: '1.15rem',
+    meta: '1rem',
+    action: '1.05rem',
+  };
+
   const [notices, setNotices] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
@@ -32,14 +47,18 @@ const NoticeManager = () => {
   const loadNotices = async () => {
     try {
       const data = await fetchNoticesAPI();
+      let items = [];
+      if (data && data.notices && Array.isArray(data.notices))
+        items = data.notices;
+      else if (Array.isArray(data)) items = data;
 
-      if (data && data.notices && Array.isArray(data.notices)) {
-        setNotices(data.notices);
-      } else if (Array.isArray(data)) {
-        setNotices(data);
-      } else {
-        setNotices([]);
-      }
+      // ✅ 최신순 정렬 추가
+      items.sort((a, b) => {
+        if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      setNotices(items);
     } catch (e) {
       console.error(e);
       setNotices([]);
@@ -117,8 +136,8 @@ const NoticeManager = () => {
         }
         handleCancelEdit();
         loadNotices();
-      } catch (e) {
-        console.error(e);
+      } catch (e2) {
+        console.error(e2);
         toast.error(`${actionName} 실패`);
       }
     }
@@ -161,12 +180,12 @@ const NoticeManager = () => {
       >
         <h2
           style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            marginBottom: '20px',
+            fontSize: FS.h2,
+            fontWeight: 900,
+            marginBottom: '18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             color: '#111827',
           }}
         >
@@ -183,15 +202,15 @@ const NoticeManager = () => {
             <label
               style={{
                 display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '600',
+                fontSize: FS.label,
+                fontWeight: 800,
                 color: '#374151',
-                marginBottom: '4px',
+                marginBottom: '6px',
               }}
             >
               분류
             </label>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               {['general', 'urgent', 'update'].map((type) => (
                 <button
                   key={type}
@@ -199,10 +218,10 @@ const NoticeManager = () => {
                   onClick={() => setFormData({ ...formData, type })}
                   style={{
                     flex: 1,
-                    padding: '10px',
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    fontSize: FS.typeBtn,
+                    fontWeight: 800,
                     border:
                       formData.type === type
                         ? '2px solid transparent'
@@ -242,10 +261,10 @@ const NoticeManager = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '12px',
+              gap: '12px',
+              padding: '14px',
               backgroundColor: formData.isPinned ? '#fff7ed' : '#fafafa',
-              borderRadius: '8px',
+              borderRadius: '10px',
               border: formData.isPinned
                 ? '1px solid #ffedd5'
                 : '1px solid #f0f0f0',
@@ -260,8 +279,8 @@ const NoticeManager = () => {
                 setFormData({ ...formData, isPinned: e.target.checked })
               }
               style={{
-                width: '18px',
-                height: '18px',
+                width: '22px',
+                height: '22px',
                 cursor: 'pointer',
                 accentColor: '#ea580c',
               }}
@@ -270,12 +289,12 @@ const NoticeManager = () => {
               htmlFor="pin-check"
               style={{
                 cursor: 'pointer',
-                fontWeight: 'bold',
+                fontWeight: 900,
                 color: formData.isPinned ? '#ea580c' : '#666',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.95rem',
+                gap: '8px',
+                fontSize: FS.pinLabel,
               }}
             >
               <FaThumbtack /> 이 공지를 목록 최상단에 고정합니다
@@ -287,10 +306,10 @@ const NoticeManager = () => {
             <label
               style={{
                 display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '600',
+                fontSize: FS.label,
+                fontWeight: 800,
                 color: '#374151',
-                marginBottom: '4px',
+                marginBottom: '6px',
               }}
             >
               제목
@@ -304,10 +323,10 @@ const NoticeManager = () => {
               placeholder="제목을 입력하세요"
               style={{
                 width: '100%',
-                padding: '12px',
-                borderRadius: '8px',
+                padding: '14px',
+                borderRadius: '10px',
                 border: '1px solid #d1d5db',
-                fontSize: '0.95rem',
+                fontSize: FS.input,
               }}
             />
           </div>
@@ -317,10 +336,10 @@ const NoticeManager = () => {
             <label
               style={{
                 display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '600',
+                fontSize: FS.label,
+                fontWeight: 800,
                 color: '#374151',
-                marginBottom: '4px',
+                marginBottom: '6px',
               }}
             >
               이미지 URL (선택)
@@ -334,17 +353,17 @@ const NoticeManager = () => {
               placeholder="https://example.com/image.jpg"
               style={{
                 width: '100%',
-                padding: '12px',
-                borderRadius: '8px',
+                padding: '14px',
+                borderRadius: '10px',
                 border: '1px solid #d1d5db',
-                fontSize: '0.95rem',
+                fontSize: FS.input,
               }}
             />
             {formData.imageUrl && (
               <div
                 style={{
-                  marginTop: '10px',
-                  borderRadius: '8px',
+                  marginTop: '12px',
+                  borderRadius: '10px',
                   overflow: 'hidden',
                   border: '1px solid #e5e7eb',
                   backgroundColor: '#f9fafb',
@@ -357,7 +376,7 @@ const NoticeManager = () => {
                   alt="미리보기"
                   style={{
                     maxWidth: '100%',
-                    maxHeight: '200px',
+                    maxHeight: '220px',
                     objectFit: 'contain',
                   }}
                   onError={(e) => (e.target.style.display = 'none')}
@@ -371,10 +390,10 @@ const NoticeManager = () => {
             <label
               style={{
                 display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '600',
+                fontSize: FS.label,
+                fontWeight: 800,
                 color: '#374151',
-                marginBottom: '4px',
+                marginBottom: '6px',
               }}
             >
               내용
@@ -387,33 +406,33 @@ const NoticeManager = () => {
               placeholder="내용을 입력하세요..."
               style={{
                 width: '100%',
-                height: '250px',
-                padding: '12px',
-                borderRadius: '8px',
+                height: '290px',
+                padding: '14px',
+                borderRadius: '10px',
                 border: '1px solid #d1d5db',
-                fontSize: '0.95rem',
+                fontSize: FS.input,
                 resize: 'vertical',
-                lineHeight: '1.6',
+                lineHeight: '1.7',
               }}
             />
           </div>
 
           {/* 버튼 */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
             {editingId && (
               <button
                 type="button"
                 onClick={handleCancelEdit}
                 style={{
                   flex: 1,
-                  padding: '12px',
+                  padding: '14px',
                   backgroundColor: '#9ca3af',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  fontWeight: 900,
                   cursor: 'pointer',
-                  fontSize: '1rem',
+                  fontSize: FS.btn,
                 }}
               >
                 취소
@@ -423,18 +442,18 @@ const NoticeManager = () => {
               type="submit"
               style={{
                 flex: 2,
-                padding: '12px',
+                padding: '14px',
                 backgroundColor: editingId ? '#16a34a' : '#2563eb',
                 color: 'white',
                 border: 'none',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                fontSize: '1rem',
+                borderRadius: '10px',
+                fontWeight: 900,
+                fontSize: FS.btn,
                 cursor: 'pointer',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
               }}
             >
               <FaCheck /> {editingId ? '수정 완료' : '등록하기'}
@@ -458,12 +477,12 @@ const NoticeManager = () => {
       >
         <h2
           style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            marginBottom: '20px',
+            fontSize: FS.h2,
+            fontWeight: 900,
+            marginBottom: '18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             color: '#111827',
           }}
         >
@@ -489,10 +508,12 @@ const NoticeManager = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
+                fontSize: FS.preview,
+                fontWeight: 700,
               }}
             >
-              <FaBullhorn size={40} style={{ opacity: 0.2 }} />
+              <FaBullhorn size={52} style={{ opacity: 0.18 }} />
               <span>등록된 공지사항이 없습니다.</span>
             </div>
           ) : (
@@ -500,13 +521,13 @@ const NoticeManager = () => {
               <div
                 key={notice._id}
                 style={{
-                  padding: '16px',
+                  padding: '18px',
                   border: notice.isPinned
                     ? '2px solid #fdba74'
                     : editingId === notice._id
                       ? '2px solid #2563eb'
                       : '1px solid #f3f4f6',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   backgroundColor: notice.isPinned ? '#fffaf0' : '#f9fafb',
                   position: 'relative',
                   transition: 'all 0.2s',
@@ -517,8 +538,8 @@ const NoticeManager = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '8px',
+                    gap: '10px',
+                    marginBottom: '10px',
                     flexWrap: 'wrap',
                   }}
                 >
@@ -530,10 +551,10 @@ const NoticeManager = () => {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: '4px',
+                      padding: '6px',
                       display: 'flex',
                       alignItems: 'center',
-                      color: notice.isPinned ? '#ea580c' : '#d1d5db', // 고정됨:오렌지, 아님:회색
+                      color: notice.isPinned ? '#ea580c' : '#d1d5db',
                       transition: 'transform 0.2s',
                     }}
                     onMouseOver={(e) =>
@@ -543,18 +564,18 @@ const NoticeManager = () => {
                       (e.currentTarget.style.transform = 'scale(1)')
                     }
                   >
-                    <FaThumbtack size={14} />
+                    <FaThumbtack size={18} />
                   </button>
 
                   {notice.type === 'urgent' && (
                     <span
                       style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
+                        fontSize: FS.badge,
+                        padding: '4px 8px',
+                        borderRadius: '6px',
                         backgroundColor: '#fee2e2',
                         color: '#991b1b',
-                        fontWeight: 'bold',
+                        fontWeight: 900,
                       }}
                     >
                       긴급
@@ -563,12 +584,12 @@ const NoticeManager = () => {
                   {notice.type === 'update' && (
                     <span
                       style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
+                        fontSize: FS.badge,
+                        padding: '4px 8px',
+                        borderRadius: '6px',
                         backgroundColor: '#dcfce7',
                         color: '#166534',
-                        fontWeight: 'bold',
+                        fontWeight: 900,
                       }}
                     >
                       업데이트
@@ -577,12 +598,12 @@ const NoticeManager = () => {
                   {notice.type === 'general' && (
                     <span
                       style={{
-                        fontSize: '0.7rem',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
+                        fontSize: FS.badge,
+                        padding: '4px 8px',
+                        borderRadius: '6px',
                         backgroundColor: '#e5e7eb',
                         color: '#374151',
-                        fontWeight: 'bold',
+                        fontWeight: 900,
                       }}
                     >
                       일반
@@ -591,8 +612,8 @@ const NoticeManager = () => {
 
                   <h4
                     style={{
-                      fontSize: '1rem',
-                      fontWeight: '600',
+                      fontSize: FS.title,
+                      fontWeight: 900,
                       color: '#1f2937',
                       margin: 0,
                     }}
@@ -604,17 +625,17 @@ const NoticeManager = () => {
                 {/* 내용 미리보기 */}
                 <p
                   style={{
-                    fontSize: '0.875rem',
+                    fontSize: FS.preview,
                     color: '#4b5563',
                     whiteSpace: 'pre-wrap',
-                    maxHeight: '60px',
+                    maxHeight: '84px', // 폰트 커짐 반영 (기존 60px)
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
-                    lineHeight: '1.5',
-                    marginBottom: '10px',
+                    lineHeight: '1.65',
+                    marginBottom: '12px',
                   }}
                 >
                   {notice.content}
@@ -628,14 +649,20 @@ const NoticeManager = () => {
                     alignItems: 'center',
                     marginTop: 'auto',
                     borderTop: '1px solid rgba(0,0,0,0.05)',
-                    paddingTop: '8px',
+                    paddingTop: '10px',
                   }}
                 >
-                  <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+                  <span
+                    style={{
+                      fontSize: FS.meta,
+                      color: '#9ca3af',
+                      fontWeight: 700,
+                    }}
+                  >
                     {new Date(notice.createdAt).toLocaleDateString()}
                   </span>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     <button
                       onClick={() => handleEditClick(notice)}
                       style={{
@@ -643,16 +670,16 @@ const NoticeManager = () => {
                         border: '1px solid #dbeafe',
                         color: '#2563eb',
                         cursor: 'pointer',
-                        fontSize: '0.8rem',
+                        fontSize: FS.action,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontWeight: '600',
+                        gap: '6px',
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        fontWeight: 900,
                       }}
                     >
-                      <FaEdit size={12} /> 수정
+                      <FaEdit size={16} /> 수정
                     </button>
                     <button
                       onClick={() => handleDelete(notice._id)}
@@ -661,16 +688,16 @@ const NoticeManager = () => {
                         border: '1px solid #fee2e2',
                         color: '#ef4444',
                         cursor: 'pointer',
-                        fontSize: '0.8rem',
+                        fontSize: FS.action,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontWeight: '600',
+                        gap: '6px',
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        fontWeight: 900,
                       }}
                     >
-                      <FaTrash size={12} /> 삭제
+                      <FaTrash size={16} /> 삭제
                     </button>
                   </div>
                 </div>

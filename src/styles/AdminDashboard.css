@@ -1,13 +1,112 @@
 /* =========================================
-   1. 전체 레이아웃 (7:3 분할)
+   0. Admin Dashboard: Sticky Header/Tabs + 내부 스크롤 설계
+   - AdminDashboard.js 구조: .admin-dashboard > .dashboard-header > .dashboard-tabs > .dashboard-content
+     :contentReference[oaicite:2]{index=2}
+   ========================================= */
+
+/* 대시보드 전체를 뷰포트에 고정 (페이지 끝없이 늘어나는 문제 방지) */
+.admin-dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ✅ 바깥(body) 스크롤 차단 */
+  background-color: #f5f5f7;
+}
+
+/* 헤더 높이(60px)는 기존 CSS 기준 :contentReference[oaicite:3]{index=3} */
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* 탭도 헤더 아래에 스티키 */
+.dashboard-tabs {
+  position: sticky;
+  top: 60px; /* ✅ 헤더 높이만큼 */
+  z-index: 999;
+  background: #fff;
+}
+
+/* 탭 버튼 폰트/패딩 살짝 확대 (인라인 style도 덮어씀) */
+.dashboard-tabs button {
+  font-size: 1.05rem !important;
+  padding: 16px 28px !important;
+  line-height: 1.2;
+}
+
+/* 본문은 남은 영역을 “고정 높이”로 가져가고, 내부만 스크롤되게 */
+.dashboard-content {
+  flex: 1;
+  min-height: 0;     /* ✅ 내부 스크롤 필수 */
+  overflow: hidden;  /* ✅ dashboard-content 자체는 스크롤 금지 (자식에서만) */
+
+  /* ✅ 요청: 본문 폰트 약 30% 업 (기본 16px 기준 20~21px 느낌) */
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+}
+
+/* 탭 컨텐츠(NoticeManager/FaqManager/ServiceGuideManager/UserTable) 높이를 100%로 */
+.dashboard-content > * {
+  height: 100%;
+  min-height: 0; /* ✅ 내부 스크롤 필수 */
+}
+
+/* 박스 모델 안정화 (height 100% + padding 조합에서 튀는 문제 방지) */
+.dashboard-content,
+.dashboard-content * {
+  box-sizing: border-box;
+}
+
+/* ✅ 폰트 강제 업스케일 (각 매니저가 인라인 fontSize를 많이 쓰므로 !important로 덮음) */
+.dashboard-content input,
+.dashboard-content textarea,
+.dashboard-content select {
+  font-size: 1em !important;
+}
+
+.dashboard-content button,
+.dashboard-content label,
+.dashboard-content p,
+.dashboard-content li,
+.dashboard-content span,
+.dashboard-content td,
+.dashboard-content th {
+  font-size: 0.95em !important;
+}
+
+/* 섹션 타이틀 계열 */
+.dashboard-content h2 {
+  font-size: 1.25em !important;
+}
+.dashboard-content h3 {
+  font-size: 1.1em !important;
+}
+.dashboard-content small {
+  font-size: 0.85em !important;
+}
+
+/* ✅ 요청 반영: 포커스 파란 박스 제거 */
+.dashboard-content input:focus,
+.dashboard-content textarea:focus,
+.dashboard-content select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================
+   1. 전체 레이아웃 (7:3 분할) - (UserTable 쪽)
+   기존에는 100vh 기반이었는데, 이제 dashboard-content가 높이를 책임지므로 100%로 변경
+   :contentReference[oaicite:4]{index=4}
    ========================================= */
 .split-layout-container {
   display: flex;
   width: 100%;
-  height: calc(100vh - 120px); /* 헤더 제외 높이 꽉 채우기 */
+  height: 100%;          /* ✅ (기존: calc(100vh - 120px)) */
+  min-height: 0;         /* ✅ 내부 스크롤 필수 */
   gap: 20px;
   background-color: #f5f5f7;
-  overflow: hidden; /* 페이지 전체 스크롤 방지 */
+  overflow: hidden;      /* 페이지 전체 스크롤 방지 */
   padding-bottom: 20px;
 }
 
@@ -19,6 +118,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden; /* 패널 밖으로 내용 넘침 방지 */
+  min-height: 0;    /* ✅ 내부 스크롤 필수 */
 }
 
 /* ✅ [수정] 헤더 그리드 레이아웃 적용 */
@@ -89,6 +189,7 @@
 /* 테이블 스크롤 영역 */
 .table-scroll-wrapper {
   flex: 1;
+  min-height: 0; /* ✅ 내부 스크롤 필수 */
   overflow: auto; /* 가로/세로 스크롤 모두 허용 */
 }
 
