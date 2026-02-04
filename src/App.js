@@ -1,6 +1,6 @@
 // src/App.js
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'; // BrowserRouter → HashRouter
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,7 +12,8 @@ import ProtectedRoute from './Auth/ProtectedRoute';
 
 export default function App() {
   return (
-    <HashRouter> {/* HashRouter로 변경 */}
+    // ✅ future 속성을 추가하여 v7 관련 경고를 해결했습니다.
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <SocketProvider>
           <Routes>

@@ -19,7 +19,7 @@ const UserTableRow = ({ user, isExpanded, onToggleExpand, updateStatus }) => {
     setUpdating(false);
   };
 
-  const formatDate = dt => dt ? new Date(dt).toLocaleDateString('ko-KR') : '-';
+  const formatDate = (dt) => (dt ? new Date(dt).toLocaleDateString('ko-KR') : '-');
 
   return (
     <>
@@ -55,10 +55,15 @@ const UserTableRow = ({ user, isExpanded, onToggleExpand, updateStatus }) => {
           )}
         </td>
       </tr>
+
       {isExpanded && (
         <tr className="expanded-details">
           <td colSpan="7">
-            <SalesDetails hotelId={user.hotelId} hotelName={user.hotelName} />
+            <SalesDetails
+              hotelId={user.hotelId}
+              hotelName={user.hotelName}
+              approvalDate={user.approvalDate} // ✅ NEW
+            />
           </td>
         </tr>
       )}
