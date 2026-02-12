@@ -9,6 +9,7 @@ import {
   FaYoutube,
 } from 'react-icons/fa';
 import { fetchFaqsAPI, createFaqAPI, updateFaqAPI, deleteFaqAPI } from '../../api/api';
+import ImageUploader from './ImageUploader';
 
 const isValidUrl = (url) => {
   if (!url) return false;
@@ -41,6 +42,7 @@ const FaqManager = () => {
     category: 'general',
     isPinned: false,
     isVisible: true,
+    imageUrl: '',
     videoUrl: '',
     linkLabel: '',
   });
@@ -73,6 +75,7 @@ const load = async () => {
       category: 'general',
       isPinned: false,
       isVisible: true,
+      imageUrl: '',
       videoUrl: '',
       linkLabel: '',
     });
@@ -93,6 +96,7 @@ const load = async () => {
     try {
       const payload = {
         ...formData,
+        imageUrl: formData.imageUrl?.trim() || '',
         videoUrl: formData.videoUrl?.trim() || '',
         linkLabel: formData.linkLabel?.trim() || '',
       };
@@ -116,6 +120,7 @@ const load = async () => {
       category: row.category || 'general',
       isPinned: !!row.isPinned,
       isVisible: row.isVisible !== false,
+      imageUrl: row.imageUrl || '',
       videoUrl: row.videoUrl || '',
       linkLabel: row.linkLabel || '',
     });
@@ -193,6 +198,15 @@ const load = async () => {
             </label>
           </div>
 
+          {/* ✅ 이미지 업로드 */}
+          <ImageUploader
+            imageUrl={formData.imageUrl}
+            onImageChange={(url) => setFormData({ ...formData, imageUrl: url })}
+            category="faqs"
+            label="이미지 (선택)"
+            fontSize={FS.label}
+          />
+
           {/* ✅ YouTube 섹션 */}
           <label style={{ fontWeight: 800, color: '#374151', display: 'flex', alignItems: 'center', gap: 10, fontSize: FS.label }}>
             <FaYoutube color="#FF0000" /> 관련 영상(YouTube)
@@ -269,6 +283,12 @@ const load = async () => {
                 <p style={{ fontSize: FS.body, color: '#4b5563', whiteSpace: 'pre-wrap', maxHeight: 96, overflow: 'hidden', marginBottom: 12, lineHeight: 1.65 }}>
                   {row.answer}
                 </p>
+
+                {row.imageUrl && (
+                  <div style={{ marginBottom: 10, borderRadius: 8, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+                    <img src={row.imageUrl} alt="" style={{ maxWidth: '100%', maxHeight: 120, objectFit: 'contain', display: 'block', margin: '0 auto' }} onError={(e) => { e.target.style.display = 'none'; }} />
+                  </div>
+                )}
 
                 {row.videoUrl && (
                   <button

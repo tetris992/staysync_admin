@@ -15,6 +15,7 @@ import {
   FaEdit,
   FaThumbtack,
 } from 'react-icons/fa';
+import ImageUploader from './ImageUploader';
 
 const NoticeManager = () => {
   // ✅ 폰트/가독성 스케일 (대략 +30%)
@@ -331,59 +332,14 @@ const NoticeManager = () => {
             />
           </div>
 
-          {/* 이미지 URL */}
-          <div>
-            <label
-              style={{
-                display: 'block',
-                fontSize: FS.label,
-                fontWeight: 800,
-                color: '#374151',
-                marginBottom: '6px',
-              }}
-            >
-              이미지 URL (선택)
-            </label>
-            <input
-              type="text"
-              value={formData.imageUrl}
-              onChange={(e) =>
-                setFormData({ ...formData, imageUrl: e.target.value })
-              }
-              placeholder="https://example.com/image.jpg"
-              style={{
-                width: '100%',
-                padding: '14px',
-                borderRadius: '10px',
-                border: '1px solid #d1d5db',
-                fontSize: FS.input,
-              }}
-            />
-            {formData.imageUrl && (
-              <div
-                style={{
-                  marginTop: '12px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
-                <img
-                  src={formData.imageUrl}
-                  alt="미리보기"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '220px',
-                    objectFit: 'contain',
-                  }}
-                  onError={(e) => (e.target.style.display = 'none')}
-                />
-              </div>
-            )}
-          </div>
+          {/* 이미지 업로드 */}
+          <ImageUploader
+            imageUrl={formData.imageUrl}
+            onImageChange={(url) => setFormData({ ...formData, imageUrl: url })}
+            category="notices"
+            label="이미지 (선택)"
+            fontSize={FS.label}
+          />
 
           {/* 내용 */}
           <div style={{ flex: 1 }}>

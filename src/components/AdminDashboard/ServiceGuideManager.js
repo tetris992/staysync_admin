@@ -14,6 +14,7 @@ import {
   updateServiceGuideAPI,
   deleteServiceGuideAPI,
 } from '../../api/api';
+import ImageUploader from './ImageUploader';
 
 const isValidUrl = (url) => {
   if (!url) return false;
@@ -46,6 +47,7 @@ const ServiceGuideManager = () => {
     category: 'general',
     isPinned: false,
     isVisible: true,
+    imageUrl: '',
     videoUrl: '',
     linkLabel: '',
   });
@@ -80,6 +82,7 @@ const ServiceGuideManager = () => {
       category: 'general',
       isPinned: false,
       isVisible: true,
+      imageUrl: '',
       videoUrl: '',
       linkLabel: '',
     });
@@ -100,6 +103,7 @@ const ServiceGuideManager = () => {
     try {
       const payload = {
         ...formData,
+        imageUrl: formData.imageUrl?.trim() || '',
         videoUrl: formData.videoUrl?.trim() || '',
         linkLabel: formData.linkLabel?.trim() || '',
       };
@@ -123,6 +127,7 @@ const ServiceGuideManager = () => {
       category: row.category || 'general',
       isPinned: !!row.isPinned,
       isVisible: row.isVisible !== false,
+      imageUrl: row.imageUrl || '',
       videoUrl: row.videoUrl || '',
       linkLabel: row.linkLabel || '',
     });
@@ -279,6 +284,15 @@ const ServiceGuideManager = () => {
               공개
             </label>
           </div>
+
+          {/* ✅ 이미지 업로드 */}
+          <ImageUploader
+            imageUrl={formData.imageUrl}
+            onImageChange={(url) => setFormData({ ...formData, imageUrl: url })}
+            category="service-guides"
+            label="이미지 (선택)"
+            fontSize={FS.label}
+          />
 
           {/* ✅ YouTube 섹션 */}
           <label
@@ -540,6 +554,12 @@ const ServiceGuideManager = () => {
                 >
                   {row.content}
                 </p>
+
+                {row.imageUrl && (
+                  <div style={{ marginBottom: 10, borderRadius: 8, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+                    <img src={row.imageUrl} alt="" style={{ maxWidth: '100%', maxHeight: 120, objectFit: 'contain', display: 'block', margin: '0 auto' }} onError={(e) => { e.target.style.display = 'none'; }} />
+                  </div>
+                )}
 
                 {row.videoUrl && (
                   <button

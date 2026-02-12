@@ -406,6 +406,29 @@ export const fetchHotelSales = async (hotelId, type, startDate, endDate) => {
 };
 
 // ======================================================================
+// 🖼️ 공통 이미지 업로드 API
+// ======================================================================
+
+export const uploadImageAPI = async (file, category = 'notices') => {
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await api.post(`/api/upload/image?category=${encodeURIComponent(category)}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000,
+    });
+    return response.data;
+  } catch (err) {
+    console.error('[api] Upload image error:', err.response?.data || err.message);
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '이미지 업로드 실패'
+    );
+  }
+};
+
+// ======================================================================
 // 📢 공지사항 관리 API
 // ======================================================================
 
