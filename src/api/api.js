@@ -337,6 +337,110 @@ export const sendReservationsAllExcelAPI = async (hotelId) => {
 };
 
 // ======================================================================
+// 📦 구독 관리 API
+// ======================================================================
+
+export const fetchHotelSubscriptionAPI = async (hotelId) => {
+  try {
+    const response = await api.get(`/api/admin/users/${hotelId}/subscription`);
+    return response.data.data;
+  } catch (err) {
+    console.error('[api] Fetch subscription error:', err.response?.data?.message || err.message);
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 조회 실패'
+    );
+  }
+};
+
+export const activateSubscriptionAPI = async (hotelId) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/activate`);
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 활성화 실패'
+    );
+  }
+};
+
+export const renewSubscriptionAPI = async (hotelId) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/renew`);
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 갱신 실패'
+    );
+  }
+};
+
+export const adminSuspendSubscriptionAPI = async (hotelId, note) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/suspend`, { note });
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 일시정지 실패'
+    );
+  }
+};
+
+export const resumeSubscriptionAPI = async (hotelId) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/resume`);
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 재개 실패'
+    );
+  }
+};
+
+export const cancelSubscriptionAPI = async (hotelId, note) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/cancel`, { note });
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '구독 취소 실패'
+    );
+  }
+};
+
+export const refundSubscriptionAPI = async (hotelId, refundAmount, refundNote) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/refund`, {
+      refundAmount,
+      refundNote,
+    });
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '환불 처리 실패'
+    );
+  }
+};
+
+export const updateMonthlyCapAPI = async (hotelId, monthlyCap) => {
+  try {
+    const response = await api.patch(`/api/admin/users/${hotelId}/subscription/cap`, { monthlyCap });
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '상한캡 변경 실패'
+    );
+  }
+};
+
+// ======================================================================
 // 기타 API (기존 유지)
 // ======================================================================
 
