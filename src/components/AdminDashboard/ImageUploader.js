@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { uploadImageAPI } from '../../api/api';
 import { toast } from 'react-toastify';
-import { FaCloudUploadAlt, FaTimes, FaSpinner, FaImage } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaTimes, FaSpinner } from 'react-icons/fa';
 
 /**
  * 공통 이미지 업로드 컴포넌트
