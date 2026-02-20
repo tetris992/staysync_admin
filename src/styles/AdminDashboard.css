@@ -1,330 +1,210 @@
 /* =========================================
-   0. Admin Dashboard: Sticky Header/Tabs + 내부 스크롤 설계
-   - AdminDashboard.js 구조: .admin-dashboard > .dashboard-header > .dashboard-tabs > .dashboard-content
-     :contentReference[oaicite:2]{index=2}
+   AdminDashboard.css
+   - CSS custom properties (design tokens)
+   - Dashboard shell: header, tabs, content wrapper
+   - NOTE: table/panel styles live in UserTable.css (sole source)
    ========================================= */
 
-/* 대시보드 전체를 뷰포트에 고정 (페이지 끝없이 늘어나는 문제 방지) */
+/* =========================================
+   0. Design Tokens
+   ========================================= */
+:root {
+  /* Brand */
+  --color-primary: #1a237e;
+  --color-primary-light: #e8eaf6;
+  --color-primary-dark: #0d124d;
+  --color-primary-hover: #283593;
+
+  /* Neutral */
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-border-light: #f0f0f0;
+  --color-text: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-success-bg: #f0fdf4;
+  --color-success-text: #166534;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-warning-text: #92400e;
+  --color-danger: #ef4444;
+  --color-danger-bg: #fef2f2;
+  --color-danger-text: #991b1b;
+  --color-highlight: #e91e63;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Typography */
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-base: 0.95rem;
+  --font-size-lg: 1.1rem;
+  --font-size-xl: 1.25rem;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+}
+
+/* =========================================
+   1. Dashboard Shell
+   ========================================= */
 .admin-dashboard {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* ✅ 바깥(body) 스크롤 차단 */
-  background-color: #f5f5f7;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  font-family: var(--font-sans);
 }
 
-/* 헤더 높이(60px)는 기존 CSS 기준 :contentReference[oaicite:3]{index=3} */
+/* =========================================
+   2. Header
+   ========================================= */
 .dashboard-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  height: 60px;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-/* 탭도 헤더 아래에 스티키 */
-.dashboard-tabs {
-  position: sticky;
-  top: 60px; /* ✅ 헤더 높이만큼 */
-  z-index: 999;
-  background: #fff;
-}
-
-/* 탭 버튼 폰트/패딩 살짝 확대 (인라인 style도 덮어씀) */
-.dashboard-tabs button {
-  font-size: 1.05rem !important;
-  padding: 16px 28px !important;
-  line-height: 1.2;
-}
-
-/* 본문은 남은 영역을 “고정 높이”로 가져가고, 내부만 스크롤되게 */
-.dashboard-content {
-  flex: 1;
-  min-height: 0;     /* ✅ 내부 스크롤 필수 */
-  overflow: hidden;  /* ✅ dashboard-content 자체는 스크롤 금지 (자식에서만) */
-
-  /* ✅ 요청: 본문 폰트 약 30% 업 (기본 16px 기준 20~21px 느낌) */
-  font-family: Pretendard, sans-serif;
-  font-size: 20px;
-}
-
-/* 탭 컨텐츠(NoticeManager/FaqManager/ServiceGuideManager/UserTable) 높이를 100%로 */
-.dashboard-content > * {
-  height: 100%;
-  min-height: 0; /* ✅ 내부 스크롤 필수 */
-}
-
-/* 박스 모델 안정화 (height 100% + padding 조합에서 튀는 문제 방지) */
-.dashboard-content,
-.dashboard-content * {
-  box-sizing: border-box;
-}
-
-/* ✅ 폰트 강제 업스케일 (각 매니저가 인라인 fontSize를 많이 쓰므로 !important로 덮음) */
-.dashboard-content input,
-.dashboard-content textarea,
-.dashboard-content select {
-  font-size: 1em !important;
-}
-
-.dashboard-content button,
-.dashboard-content label,
-.dashboard-content p,
-.dashboard-content li,
-.dashboard-content span,
-.dashboard-content td,
-.dashboard-content th {
-  font-size: 0.95em !important;
-}
-
-/* 섹션 타이틀 계열 */
-.dashboard-content h2 {
-  font-size: 1.25em !important;
-}
-.dashboard-content h3 {
-  font-size: 1.1em !important;
-}
-.dashboard-content small {
-  font-size: 0.85em !important;
-}
-
-/* ✅ 요청 반영: 포커스 파란 박스 제거 */
-.dashboard-content input:focus,
-.dashboard-content textarea:focus,
-.dashboard-content select:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* =========================================
-   1. 전체 레이아웃 (7:3 분할) - (UserTable 쪽)
-   기존에는 100vh 기반이었는데, 이제 dashboard-content가 높이를 책임지므로 100%로 변경
-   :contentReference[oaicite:4]{index=4}
-   ========================================= */
-.split-layout-container {
-  display: flex;
-  width: 100%;
-  height: 100%;          /* ✅ (기존: calc(100vh - 120px)) */
-  min-height: 0;         /* ✅ 내부 스크롤 필수 */
-  gap: 20px;
-  background-color: #f5f5f7;
-  overflow: hidden;      /* 페이지 전체 스크롤 방지 */
-  padding-bottom: 20px;
-}
-
-/* 패널 공통 스타일 */
-.panel {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* 패널 밖으로 내용 넘침 방지 */
-  min-height: 0;    /* ✅ 내부 스크롤 필수 */
-}
-
-/* ✅ [수정] 헤더 그리드 레이아웃 적용 */
-.dashboard-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* 좌:1, 중앙:auto, 우:1 비율 */
-  align-items: center;
-  padding: 0 20px;
-  height: 60px;
-  background-color: white;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* 1. 좌측 영역 (필터, 소켓) */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   justify-self: start;
 }
 
-/* 필터 셀렉트 스타일 개선 */
 .status-filter-select {
   padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-  background-color: #f9f9f9;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+.status-filter-select:hover {
+  border-color: var(--color-primary);
 }
 
 .socket-badge {
-  font-size: 0.8rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 12px;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
   background-color: #f1f3f5;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
-/* 2. 중앙 영역 (제목) */
 .dashboard-title {
   margin: 0;
-  font-size: 1.5rem;
-  color: #1a237e;
+  font-size: 1.4rem;
+  color: var(--color-primary);
   font-weight: 800;
   text-align: center;
   letter-spacing: -0.5px;
 }
 
-/* 3. 우측 영역 (버튼) */
 .header-right {
   display: flex;
-  gap: 10px;
+  gap: var(--space-sm);
   justify-self: end;
 }
 
-/* -----------------------------------------
-   [Left Panel] 호텔 목록 (70%)
-   ----------------------------------------- */
-.panel.left-panel {
-  flex: 7; 
-  min-width: 0; /* Flexbox 내부 overflow 버그 방지 */
-  border-right: 1px solid #e0e0e0;
-}
-
-/* 테이블 스크롤 영역 */
-.table-scroll-wrapper {
-  flex: 1;
-  min-height: 0; /* ✅ 내부 스크롤 필수 */
-  overflow: auto; /* 가로/세로 스크롤 모두 허용 */
-}
-
-/* 테이블 스타일 */
-.full-info-table {
-  width: 100%;
-  min-width: 1000px; /* 70%라도 내용이 많으면 가로 스크롤 발생하도록 최소폭 지정 */
-  border-collapse: separate; /* Sticky Header/Column 작동을 위해 필수 */
-  border-spacing: 0;
-}
-
-/* 헤더 및 셀 공통 */
-.full-info-table th, 
-.full-info-table td {
-  padding: 14px 12px;
-  white-space: nowrap; /* 줄바꿈 방지 */
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 0.9rem;
-  vertical-align: middle;
-}
-
-/* 헤더 고정 (Sticky Header) */
-.full-info-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #1a237e;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-/* ⭐️ [중요] 첫 번째 컬럼(ID) 고정 */
-.sticky-col {
-  position: sticky;
-  left: 0;
-  background-color: #fff;
-  z-index: 5;
-  border-right: 1px solid #f0f0f0;
-  min-width: 90px;
-}
-
-/* ⭐️ [중요] 두 번째 컬럼(호텔명) 고정 */
-.sticky-col-2 {
-  position: sticky;
-  left: 90px; /* 앞 컬럼 너비만큼 띄움 */
-  background-color: #fff;
-  z-index: 5;
-  border-right: 1px solid #f0f0f0;
-  min-width: 140px;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 헤더에 있는 Sticky 컬럼은 z-index가 더 높아야 함 */
-.full-info-table th.sticky-col,
-.full-info-table th.sticky-col-2 {
-  background-color: #f8f9fa;
-  z-index: 11;
-}
-
-/* 행 선택 및 호버 효과 */
-.full-info-table tbody tr {
-  transition: background-color 0.1s;
-  cursor: pointer;
-}
-
-.full-info-table tbody tr:hover td {
-  background-color: #f9f9f9;
-}
-
-/* 선택된 행 스타일 */
-.selected-row td {
-  background-color: #e8eaf6 !important; /* 연한 남색 배경 */
-  color: #1a237e;
-  font-weight: 500;
-}
-/* 선택된 행의 Sticky 컬럼도 배경색 맞춰줌 */
-.selected-row .sticky-col,
-.selected-row .sticky-col-2 {
-  background-color: #e8eaf6 !important;
-}
-
-/* 상태 표시 점 */
-.status-lamp {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-.status-lamp.on { background-color: #4caf50; }
-.status-lamp.off { background-color: #bbb; }
-
-/* 상태 텍스트 색상 */
-.status-text.active { color: #2e7d32; font-weight: bold; }
-.status-text.pending { color: #ff9800; font-weight: bold; }
-.status-text.inactive { color: #c62828; }
-
-.center-align { text-align: center; }
-
-/* 작업 버튼 */
-.action-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.approve-button { background-color: #e8f5e9; color: #2e7d32; }
-.approve-button:hover { background-color: #c8e6c9; }
-.suspend-button { background-color: #ffebee; color: #c62828; }
-.suspend-button:hover { background-color: #ffcdd2; }
-
-/* -----------------------------------------
-   [Right Panel] 상세 정보 (30%)
-   ----------------------------------------- */
-.panel.right-panel {
-  flex: 3;
-  background-color: #fff;
-  overflow-y: auto; /* 내용 길면 세로 스크롤 */
-  border-left: 1px solid #e9ecef;
-  min-width: 500px;
-}
-
-/* 우측 패널 빈 상태 */
-.empty-state {
+/* =========================================
+   3. Tab Navigation
+   ========================================= */
+.dashboard-tabs {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 0;
+  padding: 0 var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 60px;
+  z-index: 999;
+}
+
+.dashboard-tabs button {
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.dashboard-tabs button:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.dashboard-tabs button.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* =========================================
+   4. Content Area
+   ========================================= */
+.dashboard-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+.dashboard-content > * {
   height: 100%;
-  color: #999;
-  text-align: center;
-  padding: 20px;
+  min-height: 0;
+}
+
+.dashboard-content,
+.dashboard-content * {
+  box-sizing: border-box;
+}
+
+/* Focus style cleanup */
+.dashboard-content input:focus,
+.dashboard-content textarea:focus,
+.dashboard-content select:focus {
+  outline: none;
+  box-shadow: none;
 }

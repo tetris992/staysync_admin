@@ -390,42 +390,82 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
           )}
 
           <div className="billing-breakdown">
+            {billing.isDanjamFreeApplied ? (
+              <>
+                <div className="row" style={{ color: '#999', textDecoration: 'line-through' }}>
+                  <span>기본료 ({billing.totalRooms || 0}실)</span>
+                  <span>{formatCurrency(billing.baseFeeDiscount)}</span>
+                </div>
+                <div
+                  className="row"
+                  style={{ fontSize: '0.75rem', color: '#4caf50', paddingLeft: '8px' }}
+                >
+                  <span>↳ 단잠 {billing.danjamNights}박 ≥ {billing.danjamFreeThreshold}건 기본료 면제</span>
+                  <span>-{formatCurrency(billing.baseFeeDiscount)}</span>
+                </div>
+              </>
+            ) : (
+              <div className="row">
+                <span>기본료 ({billing.totalRooms || 0}실)</span>
+                <span>{formatCurrency(billing.baseFee)}</span>
+              </div>
+            )}
+
             <div className="row">
-              <span>기본 플랫폼 사용료{billing.isProrataApplied ? ' *' : ''}</span>
-              <span className={billing.baseFeeDiscount > 0 ? 'strike-through' : ''}>
-                {formatCurrency(billing.isProrataApplied ? billing.proratedBaseFee : billing.baseFee)}
-              </span>
+              <span>단잠 이용료 ({billing.danjamNights || 0}박 × ₩1,000)</span>
+              <span>{formatCurrency(billing.danjamUsageFee)}</span>
             </div>
+
+            {billing.otaFee > 0 && (
+              <div className="row">
+                <span>OTA 연동 ({billing.subscribedOTACount || 0}개)</span>
+                <span>{formatCurrency(billing.otaFee)}</span>
+              </div>
+            )}
+
+            {billing.doorLockFee > 0 && (
+              <div className="row">
+                <span>도어락 ({billing.activeLockCount || 0}개)</span>
+                <span>{formatCurrency(billing.doorLockFee)}</span>
+              </div>
+            )}
+
+            <div className="row" style={{ fontSize: '0.85rem', color: '#666' }}>
+              <span>소계</span>
+              <span>{formatCurrency(billing.subtotal)}</span>
+            </div>
+
+            {billing.isCapApplied && (
+              <div
+                className="row"
+                style={{ fontSize: '0.75rem', color: '#1976d2', paddingLeft: '8px' }}
+              >
+                <span>↳ 상한캡 적용 (최대 {formatCurrency(billing.effectiveCap)})</span>
+                <span>{formatCurrency(billing.cappedSubtotal)}</span>
+              </div>
+            )}
 
             {billing.isProrataApplied && (
               <div
                 className="row"
-                style={{ fontSize: '0.75rem', color: '#1976d2', marginBottom: '8px', paddingLeft: '8px' }}
+                style={{ fontSize: '0.75rem', color: '#1976d2', paddingLeft: '8px' }}
               >
                 <span>* {billing.prorataNote}</span>
+                <span>({(billing.prorataRatio * 100).toFixed(1)}%)</span>
               </div>
             )}
 
-            {billing.baseFeeDiscount > 0 && (
-              <div className="row discount">
-                <span>↳ 할인 적용</span>
-                <span>-{formatCurrency(billing.baseFeeDiscount)}</span>
-              </div>
-            )}
+            <hr className="divider" />
 
             <div className="row">
-              <span>단잠 이용료 ({billing.danjamNights}박)</span>
-              <span className={billing.usageFeeDiscount > 0 ? 'strike-through' : ''}>
-                {formatCurrency(billing.rawUsageFee)}
-              </span>
+              <span>공급가액</span>
+              <span>{formatCurrency(billing.proratedSubtotal || billing.subTotal)}</span>
             </div>
 
-            {billing.usageFeeDiscount > 0 && (
-              <div className="row discount">
-                <span>↳ 상한제 할인</span>
-                <span>-{formatCurrency(billing.usageFeeDiscount)}</span>
-              </div>
-            )}
+            <div className="row" style={{ fontSize: '0.85rem', color: '#666' }}>
+              <span>부가세 (10%)</span>
+              <span>{formatCurrency(billing.vat)}</span>
+            </div>
 
             <hr className="divider" />
 
@@ -519,6 +559,34 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
                   }}
                 >
                   🎁 최초 승인월로 <strong style={{ color: '#2e7d32' }}>100% 할인</strong>이 자동 적용됩니다. 변경할 수 없습니다.
+                </div>
+              )}
+
+              {!isBetaMonth && promotion?.contractPromotionRate > 0 && promotion?.contractPromotionInfo && (
+                <div
+                  style={{
+                    fontSize: '0.8rem',
+                    color: '#555',
+                    backgroundColor: 'white',
+                    padding: '8px',
+                    borderRadius: '6px',
+                    marginBottom: '10px',
+                    border: '1px solid #1a237e30',
+                  }}
+                >
+                  <div style={{ fontWeight: 'bold', color: '#1a237e', marginBottom: 4 }}>
+                    🎁 계약 프로모션: {promotion.contractPromotionRate}% 할인 기본 적용
+                  </div>
+                  <div>
+                    기간: {promotion.contractPromotionInfo.startYear}-{String(promotion.contractPromotionInfo.startMonth).padStart(2, '0')} ~ {promotion.contractPromotionInfo.endYear}-{String(promotion.contractPromotionInfo.endMonth).padStart(2, '0')}
+                    {promotion.contractPromotionInfo.remainingMonths > 0 && ` (${promotion.contractPromotionInfo.remainingMonths}개월 남음)`}
+                  </div>
+                  {promotion.contractPromotionInfo.reason && (
+                    <div style={{ color: '#888', marginTop: 2 }}>사유: {promotion.contractPromotionInfo.reason}</div>
+                  )}
+                  <div style={{ color: '#888', marginTop: 4 }}>
+                    * "변경" 버튼으로 이번 달에 한해 다른 할인율 적용 가능
+                  </div>
                 </div>
               )}
 

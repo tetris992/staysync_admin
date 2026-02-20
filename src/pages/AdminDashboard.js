@@ -17,21 +17,10 @@ const AdminDashboard = () => {
   const { logout } = useAuth();
   const { socketStatus } = useSocket();
   const { users, filter, setFilter, isLoading, loadUsers, updateStatus } =
-    useUsers('all');
+    useUsers('active');
 
   // users | notices | faqs | serviceGuides
   const [activeTab, setActiveTab] = useState('users');
-
-  const tabBtnStyle = (key) => ({
-    padding: '15px 25px',
-    background: 'none',
-    border: 'none',
-    borderBottom: activeTab === key ? '3px solid #1a237e' : '3px solid transparent',
-    color: activeTab === key ? '#1a237e' : '#666',
-    fontWeight: 'bold',
-    fontSize: '1rem',
-    cursor: 'pointer',
-  });
 
   return (
     <div className="admin-dashboard">
@@ -70,28 +59,31 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      {/* ✅ 탭 네비게이션 */}
-      <div
-        className="dashboard-tabs"
-        style={{ padding: '0 20px', background: '#fff', borderBottom: '1px solid #ddd' }}
-      >
-        <button onClick={() => setActiveTab('users')} style={tabBtnStyle('users')}>
-          🏨 호텔 및 매출 관리
+      {/* 탭 네비게이션 */}
+      <div className="dashboard-tabs">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={activeTab === 'users' ? 'active' : ''}
+        >
+          호텔 및 매출 관리
         </button>
-
-        <button onClick={() => setActiveTab('notices')} style={tabBtnStyle('notices')}>
-          📢 공지사항
+        <button
+          onClick={() => setActiveTab('notices')}
+          className={activeTab === 'notices' ? 'active' : ''}
+        >
+          공지사항
         </button>
-
-        <button onClick={() => setActiveTab('faqs')} style={tabBtnStyle('faqs')}>
-          ❓ 자주 묻는 질문
+        <button
+          onClick={() => setActiveTab('faqs')}
+          className={activeTab === 'faqs' ? 'active' : ''}
+        >
+          자주 묻는 질문
         </button>
-
         <button
           onClick={() => setActiveTab('serviceGuides')}
-          style={tabBtnStyle('serviceGuides')}
+          className={activeTab === 'serviceGuides' ? 'active' : ''}
         >
-          📘 서비스 안내
+          서비스 안내
         </button>
       </div>
 

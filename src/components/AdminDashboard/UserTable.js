@@ -43,19 +43,6 @@ const UserTable = ({ users, updateStatus }) => {
     return <p className="no-data-message">표시할 사용자가 없습니다.</p>;
   }
 
-  const rightTabStyle = (key) => ({
-    flex: 1,
-    padding: '10px 0',
-    background: 'none',
-    border: 'none',
-    borderBottom: rightTab === key ? '3px solid #1a237e' : '3px solid transparent',
-    color: rightTab === key ? '#1a237e' : '#999',
-    fontWeight: rightTab === key ? 700 : 500,
-    fontSize: '0.85rem',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-  });
-
   return (
     <div className="split-layout-container">
       {/* [왼쪽 패널] : 호텔 목록 + 구독 칼럼 추가 */}
@@ -94,7 +81,7 @@ const UserTable = ({ users, updateStatus }) => {
                     {/* 구독 칼럼 */}
                     <td>
                       {user.subscriptionTier ? (
-                        <div>
+                        <div className="sub-col-wrapper">
                           <span
                             className="sub-col-tier"
                             style={{ backgroundColor: tierColors[user.subscriptionTier] || '#6b7280' }}
@@ -144,17 +131,23 @@ const UserTable = ({ users, updateStatus }) => {
         {selectedUser ? (
           <>
             {/* 탭 헤더 */}
-            <div style={{ display: 'flex', borderBottom: '1px solid #eee', flexShrink: 0 }}>
-              <button onClick={() => setRightTab('sales')} style={rightTabStyle('sales')}>
-                💰 매출 · 청구
+            <div className="right-panel-tabs">
+              <button
+                onClick={() => setRightTab('sales')}
+                className={`right-tab${rightTab === 'sales' ? ' active' : ''}`}
+              >
+                매출 · 청구
               </button>
-              <button onClick={() => setRightTab('subscription')} style={rightTabStyle('subscription')}>
-                📦 구독 관리
+              <button
+                onClick={() => setRightTab('subscription')}
+                className={`right-tab${rightTab === 'subscription' ? ' active' : ''}`}
+              >
+                구독 관리
               </button>
             </div>
 
             {/* 탭 내용 */}
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div className="right-panel-content">
               {rightTab === 'sales' && (
                 <SalesDetails
                   hotelId={selectedUser.hotelId}

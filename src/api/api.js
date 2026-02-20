@@ -440,6 +440,36 @@ export const updateMonthlyCapAPI = async (hotelId, monthlyCap) => {
   }
 };
 
+export const setPromotionAPI = async (hotelId, { discountRate, durationMonths, startYear, startMonth, reason }) => {
+  try {
+    const response = await api.post(`/api/admin/users/${hotelId}/subscription/promotion`, {
+      discountRate,
+      durationMonths,
+      startYear,
+      startMonth,
+      reason,
+    });
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '프로모션 설정 실패'
+    );
+  }
+};
+
+export const clearPromotionAPI = async (hotelId) => {
+  try {
+    const response = await api.delete(`/api/admin/users/${hotelId}/subscription/promotion`);
+    return response.data;
+  } catch (err) {
+    throw new ApiError(
+      err.response?.status || 500,
+      err.response?.data?.message || '프로모션 해제 실패'
+    );
+  }
+};
+
 // ======================================================================
 // 기타 API (기존 유지)
 // ======================================================================

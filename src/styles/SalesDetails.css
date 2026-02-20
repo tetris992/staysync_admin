@@ -1,47 +1,48 @@
-/* src/styles/SalesDetails.css */
-/* ✅ [개선] 스크롤바 1개로 통합 */
+/* =========================================
+   SalesDetails.css — Sales & Billing panel
+   ========================================= */
 
 /* =========================================
-   1. 기본 레이아웃 (스크롤 최적화)
+   1. Layout
    ========================================= */
 .sales-details-container {
-  padding: 15px;
+  padding: var(--space-md);
   background-color: transparent;
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* ✅ 최상위 스크롤 방지 */
+  overflow: hidden;
 }
 
-/* --- [헤더 영역] --- */
+/* Header */
 .sales-details-header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: var(--space-md);
   flex-shrink: 0;
 }
 
 .sales-details-header h4 {
   margin: 0;
-  color: #1a237e;
+  color: var(--color-primary);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: var(--font-size-lg);
 }
 
-/* 월 선택기 */
+/* Month picker */
 .month-picker {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  background: #f8f9fa;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  background: #f8f9fb;
+  padding: var(--space-sm) 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
   box-sizing: border-box;
 }
 
@@ -49,113 +50,143 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: #555;
-  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
   padding: 0 10px;
+  transition: color var(--transition-fast);
+}
+.month-picker .nav-btn:hover {
+  color: var(--color-primary);
 }
 
 .month-picker .current-date {
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #333;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
 }
 
 .refresh-btn {
   border: none;
   background: none;
   cursor: pointer;
-  color: #1a237e;
+  color: var(--color-primary);
   display: flex;
   align-items: center;
+  transition: opacity var(--transition-fast);
+}
+.refresh-btn:hover {
+  opacity: 0.7;
 }
 
-/* --- [메인 그리드: 수직 스택] --- */
+/* =========================================
+   2. Dashboard Grid (vertical stack)
+   ========================================= */
 .sales-dashboard-grid {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  overflow-y: auto; /* ✅ 여기만 스크롤 */
-  padding-right: 4px;
-  flex: 1; /* ✅ 남은 공간 모두 차지 */
+  gap: var(--space-md);
+  overflow-y: auto;
+  padding-right: var(--space-xs);
+  flex: 1;
 }
 
-/* 공통 카드 스타일 */
+/* Card */
 .card {
-  background: white;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  border: 1px solid #eee;
+  background: var(--color-surface);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  transition: box-shadow var(--transition-base);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #555;
-  font-size: 0.9rem;
+  gap: var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f4f4f4;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
   justify-content: space-between;
 }
 
-/* --- [매출 카드] --- */
+/* =========================================
+   3. Revenue Card
+   ========================================= */
 .revenue-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
+.revenue-row .label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.revenue-row .value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.revenue-row .value.main {
+  color: var(--color-primary);
+}
+.revenue-row .value.highlight {
+  color: var(--color-highlight);
+}
 
-.revenue-row .label { font-size: 0.9rem; color: #666; }
-.revenue-row .value { font-size: 1.25rem; font-weight: 700; color: #333; }
-.revenue-row .value.main { color: #1a237e; }
-.revenue-row .value.highlight { color: #e91e63; }
-
-.revenue-row.sub { 
-  margin-left: 0; 
-  background-color: #fafafa; 
-  padding: 10px; 
-  border-radius: 6px; 
+.revenue-row.sub {
+  margin-left: 0;
+  background-color: #fafbfc;
+  padding: 10px;
+  border-radius: var(--radius-sm);
   margin-bottom: 10px;
 }
-.revenue-row.sub .value { font-size: 1rem; }
+.revenue-row.sub .value {
+  font-size: 1rem;
+}
 
 .revenue-info {
   margin-top: 5px;
-  font-size: 0.8rem;
-  color: #888;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
   line-height: 1.4;
   text-align: right;
 }
 
-/* --- [청구서 카드 & 스마트 기능] --- */
+/* =========================================
+   4. Billing Card
+   ========================================= */
 
-/* 1. 상태 배지 (헤더용 소형) */
+/* Status badges */
 .status-badge-sm {
-  font-size: 0.75rem;
-  padding: 3px 8px;
-  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  padding: 3px var(--space-sm);
+  border-radius: var(--radius-full);
   font-weight: 700;
   white-space: nowrap;
 }
-.status-badge-sm.paid { background-color: #e8f5e9; color: #2e7d32; }
-.status-badge-sm.sent { background-color: #fff3e0; color: #ef6c00; }
-.status-badge-sm.draft { background-color: #f5f5f5; color: #757575; }
+.status-badge-sm.paid { background-color: var(--color-success-bg); color: var(--color-success-text); }
+.status-badge-sm.sent { background-color: var(--color-warning-bg); color: var(--color-warning-text); }
+.status-badge-sm.draft { background-color: #f5f5f5; color: var(--color-text-secondary); }
 
-/* 2. 경고/알림 박스 */
+/* Alert box */
 .alert-box {
   display: flex;
   gap: 10px;
   padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 15px;
-  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  font-size: var(--font-size-xs);
   line-height: 1.4;
   align-items: flex-start;
 }
@@ -163,37 +194,35 @@
 .alert-box p { margin: 0; }
 
 .alert-box.error {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border: 1px solid #fecaca;
 }
 .alert-box.warning {
-  background-color: #fff8e1;
-  color: #f57f17;
-  border: 1px solid #ffe082;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border: 1px solid #fde68a;
 }
 
-/* 3. 청구 내역 텍스트 */
+/* Billing breakdown */
 .billing-breakdown {
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
 }
-
 .billing-breakdown .row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
-  color: #555;
+  color: var(--color-text-secondary);
 }
-
 .billing-breakdown .row.discount {
-  color: #d32f2f;
-  font-size: 0.8rem;
-  margin-bottom: 8px;
-  padding-left: 8px;
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--space-sm);
+  padding-left: var(--space-sm);
 }
 
-.strike-through { text-decoration: line-through; color: #aaa; }
-.divider { margin: 12px 0; border: 0; border-top: 1px dashed #ddd; }
+.strike-through { text-decoration: line-through; color: var(--color-text-muted); }
+.divider { margin: 12px 0; border: 0; border-top: 1px dashed var(--color-border); }
 
 .total-display {
   display: flex;
@@ -201,117 +230,119 @@
   align-items: center;
   margin-top: 12px;
   padding: 12px;
-  background-color: #f0f2ff;
-  border-radius: 8px;
-  color: #1a237e;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
 }
-.total-display .amount { font-size: 1.2rem; font-weight: 800; }
+.total-display .amount {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
 
-/* 4. 액션 버튼 그룹 (수직 스택) */
+/* =========================================
+   5. Action Buttons
+   ========================================= */
 .billing-actions-vertical {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 15px;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .action-btn {
   width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
+  gap: var(--space-sm);
+  transition: all var(--transition-base);
 }
 .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* 버튼 색상 테마 */
-.action-btn.primary { background-color: #1a237e; color: white; }
-.action-btn.primary:hover:not(:disabled) { background-color: #0d124d; }
-.action-btn.primary.alert { 
-  background-color: #d32f2f; 
-  animation: pulse 2s infinite; 
+.action-btn.primary { background-color: var(--color-primary); color: white; }
+.action-btn.primary:hover:not(:disabled) { background-color: var(--color-primary-dark); }
+.action-btn.primary.alert {
+  background-color: var(--color-danger);
+  animation: pulse 2s infinite;
 }
 
-.action-btn.success { background-color: #4caf50; color: white; }
-.action-btn.success:hover:not(:disabled) { background-color: #388e3c; }
+.action-btn.success { background-color: var(--color-success); color: white; }
+.action-btn.success:hover:not(:disabled) { background-color: #16a34a; }
 
-.action-btn.secondary { 
-  background-color: #f5f5f5; 
-  color: #616161; 
-  border: 1px solid #e0e0e0; 
+.action-btn.secondary {
+  background-color: #f5f5f5;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
 }
-.action-btn.secondary:hover:not(:disabled) { background-color: #eeeeee; }
+.action-btn.secondary:hover:not(:disabled) { background-color: #e5e7eb; }
 
-.action-btn.danger.outline { 
-  background-color: transparent; 
-  border: 1px solid #ef9a9a; 
-  color: #c62828; 
+.action-btn.danger.outline {
+  background-color: transparent;
+  border: 1px solid #fca5a5;
+  color: var(--color-danger-text);
 }
-.action-btn.danger.outline:hover:not(:disabled) { background-color: #ffebee; }
+.action-btn.danger.outline:hover:not(:disabled) { background-color: var(--color-danger-bg); }
 
-/* 5. 히스토리 링크 */
+/* History link */
 .history-link {
   text-align: center;
   margin-top: 12px;
-  font-size: 0.8rem;
-  color: #999;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
+  transition: color var(--transition-fast);
 }
-.history-link:hover { color: #1a237e; text-decoration: underline; }
+.history-link:hover { color: var(--color-primary); text-decoration: underline; }
 
-
-/* --- [테이블 카드 (상세 내역)] --- */
+/* =========================================
+   6. Detail Table
+   ========================================= */
 .table-container {
-  max-height: 300px; /* ✅ 높이 제한 줄임 */
-  overflow-y: auto; /* ✅ 테이블 내부 스크롤 */
-  border: 1px solid #eee;
-  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
 }
 
 .details-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
-
 .details-table th, .details-table td {
-  padding: 8px 6px;
+  padding: var(--space-sm) 6px;
   text-align: left;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
 }
-
 .details-table th {
-  background-color: #fafafa;
-  color: #666;
+  background-color: #fafbfc;
+  color: var(--color-text-secondary);
   font-weight: 600;
   position: sticky;
   top: 0;
   white-space: nowrap;
-  z-index: 1; /* ✅ 헤더가 위에 표시 */
+  z-index: 1;
 }
-
 .details-table td.right { text-align: right; }
 .details-table td.center { text-align: center; }
 
-
 /* =========================================
-   2. 모달 (화면 전체 덮기)
+   7. Modal
    ========================================= */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -319,14 +350,14 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-surface);
   width: 90%;
   max-width: 450px;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
 }
@@ -335,63 +366,69 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: var(--space-md);
   padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-light);
 }
-.modal-header h3 { margin: 0; color: #333; font-size: 1.1rem; }
-.close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999; }
+.modal-header h3 { margin: 0; color: var(--color-text); font-size: var(--font-size-lg); }
+.close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-text-muted); }
 
-/* 히스토리 리스트 스타일 */
-.history-list { display: flex; flex-direction: column; gap: 15px; }
+/* History list */
+.history-list { display: flex; flex-direction: column; gap: var(--space-md); }
 .history-item {
   display: flex;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px dashed #eee;
+  border-bottom: 1px dashed var(--color-border-light);
+  transition: background-color var(--transition-fast);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-sm) 12px;
+}
+.history-item:hover {
+  background-color: #f8f9fb;
 }
 .history-item:last-child { border-bottom: none; }
 
 .history-icon { font-size: 1.2rem; margin-top: 2px; }
 .history-info { flex: 1; }
-.history-title { font-weight: bold; font-size: 0.9rem; color: #333; margin-bottom: 2px; }
-.history-meta { font-size: 0.75rem; color: #999; }
-.history-note { 
-  background: #f5f5f5; 
-  padding: 4px 8px; 
-  border-radius: 4px; 
-  font-size: 0.8rem; 
-  margin-top: 6px; 
-  color: #666; 
+.history-title { font-weight: bold; font-size: var(--font-size-sm); color: var(--color-text); margin-bottom: 2px; }
+.history-meta { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.history-note {
+  background: #f5f5f5;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  margin-top: 6px;
+  color: var(--color-text-secondary);
 }
-.history-amount { font-weight: bold; color: #1a237e; font-size: 0.9rem; align-self: flex-start; }
+.history-amount { font-weight: bold; color: var(--color-primary); font-size: var(--font-size-sm); align-self: flex-start; }
 
-/* 애니메이션 */
+/* =========================================
+   8. Animations
+   ========================================= */
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* ✅ [추가] 스크롤바 스타일링 */
+/* =========================================
+   9. Scrollbar
+   ========================================= */
 .sales-dashboard-grid::-webkit-scrollbar,
 .table-container::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
-
 .sales-dashboard-grid::-webkit-scrollbar-track,
 .table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  background: transparent;
 }
-
 .sales-dashboard-grid::-webkit-scrollbar-thumb,
 .table-container::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
+  background: #d1d5db;
+  border-radius: var(--radius-full);
 }
-
 .sales-dashboard-grid::-webkit-scrollbar-thumb:hover,
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #9ca3af;
 }

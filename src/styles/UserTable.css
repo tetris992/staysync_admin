@@ -1,207 +1,290 @@
-/* src/styles/UserTable.css - Full Replacement */
+/* =========================================
+   UserTable.css — Sole source for table & panel styles
+   ========================================= */
 
 /* =========================================
-   1. 전체 레이아웃 (7:3 분할 + 최소 너비 보장)
+   1. Split Layout (7:3)
    ========================================= */
 .split-layout-container {
   display: flex;
   width: 100%;
-  height: calc(100vh - 120px); /* 헤더 제외 높이 꽉 채우기 (필요시 조정) */
-  gap: 20px;
-  background-color: #f5f5f7;
-  
-  /* ⭐️ [중요] 화면이 작아져도 패널들이 찌그러지지 않도록 전체 최소 너비 설정 */
-  /* 왼쪽 최소(약 400px) + 오른쪽 고정(500px) + 간격 = 약 1000px */
-  min-width: 1000px; 
-  overflow-x: auto; /* 창이 너무 작으면 전체 가로 스크롤 발생 */
-  padding-bottom: 20px; /* 하단 스크롤바와 겹치지 않게 여백 */
+  height: 100%;
+  gap: var(--space-lg);
+  background-color: var(--color-bg);
+  overflow: hidden;
+  padding: 0 var(--space-lg) var(--space-lg);
+  min-height: 0;
 }
 
-/* 패널 공통 스타일 */
+/* Panel base */
 .panel {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 패널 밖으로 내용 넘침 방지 */
+  overflow: hidden;
+  min-height: 0;
 }
 
-/* -----------------------------------------
-   [Left Panel] 호텔 목록 (유동적 너비)
-   ----------------------------------------- */
+/* =========================================
+   2. Left Panel — Hotel List
+   ========================================= */
 .panel.left-panel {
-  flex: 1; /* 남은 공간 모두 차지 (오른쪽 패널 제외한 나머지) */
-  min-width: 400px; /* 왼쪽 패널도 너무 작아지지 않게 최소한의 방어 */
-  border-right: 1px solid #e0e0e0;
+  flex: 1;
+  min-width: 400px;
 }
 
-/* 테이블 스크롤 영역 (패널 내부) */
 .table-scroll-wrapper {
   flex: 1;
-  overflow: auto; /* 가로/세로 스크롤 모두 허용 */
+  min-height: 0;
+  overflow: auto;
 }
 
-/* 테이블 스타일 */
+/* Table */
 .full-info-table {
   width: 100%;
-  min-width: 800px; /* 컬럼이 많으므로 테이블 자체의 최소 폭 유지 */
-  border-collapse: separate; /* Sticky Header/Column 작동을 위해 필수 */
+  min-width: 800px;
+  border-collapse: separate;
   border-spacing: 0;
 }
 
-/* 헤더 및 셀 공통 */
-.full-info-table th, 
+/* Header & Cell */
+.full-info-table th,
 .full-info-table td {
-  padding: 14px 12px;
-  white-space: nowrap; /* 줄바꿈 방지 */
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 0.9rem;
+  padding: 12px 14px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: var(--font-size-sm);
   vertical-align: middle;
   text-align: left;
 }
 
-/* 헤더 고정 (Sticky Header) */
+/* Modern table header */
 .full-info-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #1a237e;
+  background-color: #f8f9fb;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   position: sticky;
   top: 0;
   z-index: 10;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid var(--color-border);
 }
 
-/* ⭐️ [중요] 첫 번째 컬럼(ID) 고정 */
+/* Sticky column 1 (ID) */
 .sticky-col {
   position: sticky;
   left: 0;
-  background-color: #fff;
+  background-color: var(--color-surface);
   z-index: 5;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid var(--color-border-light);
   min-width: 90px;
 }
 
-/* ⭐️ [중요] 두 번째 컬럼(호텔명) 고정 */
+/* Sticky column 2 (Hotel Name) */
 .sticky-col-2 {
   position: sticky;
-  left: 90px; /* 앞 컬럼 너비만큼 띄움 (값 조정 필요시 변경) */
-  background-color: #fff;
+  left: 90px;
+  background-color: var(--color-surface);
   z-index: 5;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid var(--color-border-light);
   min-width: 140px;
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 헤더에 있는 Sticky 컬럼은 z-index가 더 높아야 함 */
+/* Sticky columns in header need higher z-index */
 .full-info-table th.sticky-col,
 .full-info-table th.sticky-col-2 {
-  background-color: #f8f9fa;
+  background-color: #f8f9fb;
   z-index: 11;
 }
 
-/* 행 선택 및 호버 효과 */
+/* Row hover & selection */
 .full-info-table tbody tr {
-  transition: background-color 0.1s;
+  transition: background-color var(--transition-fast);
   cursor: pointer;
 }
 
 .full-info-table tbody tr:hover td {
-  background-color: #f9f9f9;
+  background-color: #f8f9fb;
 }
 
-/* 선택된 행 스타일 (오른쪽 패널에 표시 중인 호텔) */
+/* Selected row */
 .selected-row td {
-  background-color: #e8eaf6 !important; /* 연한 남색 배경 */
-  color: #1a237e;
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-primary);
   font-weight: 500;
 }
-/* 선택된 행의 Sticky 컬럼도 배경색 맞춰줌 */
 .selected-row .sticky-col,
 .selected-row .sticky-col-2 {
-  background-color: #e8eaf6 !important;
+  background-color: var(--color-primary-light) !important;
 }
 
-/* -----------------------------------------
-   [Right Panel] 상세 정보 (고정 너비 보장)
-   ----------------------------------------- */
+/* =========================================
+   3. Status Indicators
+   ========================================= */
+.status-lamp {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.status-lamp.on {
+  background-color: var(--color-success);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+.status-lamp.off {
+  background-color: #d1d5db;
+}
+
+.status-text.active   { color: var(--color-success-text); font-weight: 600; }
+.status-text.inactive { color: var(--color-danger-text); font-weight: 600; }
+.status-text.pending  { color: var(--color-warning-text); font-weight: 600; }
+
+.center-align { text-align: center; }
+
+/* =========================================
+   4. Action Buttons
+   ========================================= */
+.action-button {
+  padding: 6px 14px;
+  margin: 0 2px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.approve-button {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+.approve-button:hover {
+  background-color: #dcfce7;
+}
+
+.suspend-button {
+  background-color: #f5f5f5;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+.suspend-button:hover {
+  background-color: #e5e7eb;
+  color: var(--color-text);
+}
+
+/* =========================================
+   5. Right Panel — Detail
+   ========================================= */
 .panel.right-panel {
-  /* ⭐️ 늘어나지도(flex-grow: 0), 줄어들지도(flex-shrink: 0) 않고 500px 고정 */
-  flex: 0 0 500px; 
-  min-width: 500px; /* 확실한 최소 너비 보장 */
-  
-  background-color: #fff;
-  overflow-y: auto; /* 내용 길면 세로 스크롤 */
-  border-left: 1px solid #e9ecef;
+  flex: 0 0 500px;
+  min-width: 500px;
+  background-color: var(--color-surface);
+  overflow-y: auto;
 }
 
-/* 우측 패널 빈 상태 (선택된 호텔 없음) */
+/* Right panel tabs */
+.right-panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.right-tab {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.right-tab:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+.right-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Right panel content area */
+.right-panel-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Empty state */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--color-text-muted);
   text-align: center;
-  padding: 20px;
-  font-size: 1.1rem;
+  padding: var(--space-lg);
+  font-size: var(--font-size-lg);
 }
 
-/* -----------------------------------------
-   기타 스타일 (상태 램프, 텍스트, 버튼)
-   ----------------------------------------- */
-
-/* 상태 램프 */
-.status-lamp {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 8px;
-  vertical-align: middle;
+/* =========================================
+   6. Scrollbar
+   ========================================= */
+.table-scroll-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-.status-lamp.on  { background-color: #4caf50; }
-.status-lamp.off { background-color: #e0e0e0; }
-
-/* 상태 텍스트 색상 */
-.status-text.active   { color: #2e7d32; font-weight: bold; }
-.status-text.inactive { color: #c62828; font-weight: bold; }
-.status-text.pending  { color: #ff9800; font-weight: bold; }
-
-.center-align { text-align: center; }
-
-/* 버튼 스타일 */
-.action-button {
-  padding: 6px 12px;
-  margin: 0 2px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: background-color 0.2s, transform 0.1s;
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: transparent;
 }
-.action-button:hover {
-  transform: translateY(-1px);
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: var(--radius-full);
+}
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
-.approve-button {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-.approve-button:hover {
-  background-color: #c8e6c9;
+/* =========================================
+   7. Responsive
+   ========================================= */
+@media (max-width: 1200px) {
+  .panel.right-panel {
+    flex: 0 0 380px;
+    min-width: 380px;
+  }
 }
 
-.suspend-button {
-  background-color: #f5f5f5;
-  color: #666;
-  border: 1px solid #ddd;
-}
-.suspend-button:hover {
-  background-color: #e0e0e0;
-  color: #333;
+@media (max-width: 900px) {
+  .split-layout-container {
+    flex-direction: column;
+    overflow-y: auto;
+    padding: var(--space-md);
+  }
+  .panel.left-panel {
+    min-width: 0;
+    max-height: 50vh;
+  }
+  .panel.right-panel {
+    flex: none;
+    min-width: 0;
+    width: 100%;
+  }
 }

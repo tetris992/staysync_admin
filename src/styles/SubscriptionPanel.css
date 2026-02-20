@@ -1,11 +1,9 @@
-/* src/styles/SubscriptionPanel.css */
-
 /* =========================================
-   구독 관리 패널 (SalesDetails 패턴 준수)
+   SubscriptionPanel.css — Subscription management panel
    ========================================= */
 
 .sub-panel-container {
-  padding: 15px;
+  padding: var(--space-md);
   background-color: transparent;
   height: 100%;
   display: flex;
@@ -17,16 +15,16 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-light);
   padding-bottom: 12px;
   flex-shrink: 0;
 }
 
 .sub-panel-header h4 {
   margin: 0;
-  color: #1a237e;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 1.05rem;
 }
@@ -37,7 +35,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 20px;
+  padding-bottom: var(--space-lg);
 }
 
 .sub-panel-loading {
@@ -45,15 +43,15 @@
   align-items: center;
   justify-content: center;
   padding: 40px 0;
-  color: #999;
-  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
-/* --- 상태 뱃지 행 --- */
+/* --- Status Badge Row --- */
 .sub-status-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   margin: 10px 0;
   flex-wrap: wrap;
 }
@@ -61,9 +59,9 @@
 .sub-tier-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: var(--space-xs) 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
   font-weight: 700;
   color: #fff;
   letter-spacing: 0.5px;
@@ -73,7 +71,7 @@
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
   font-size: 0.78rem;
   font-weight: 600;
 }
@@ -82,19 +80,19 @@
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
   font-weight: 600;
   background-color: #d1fae5;
   color: #065f46;
   border: 1px solid #6ee7b7;
 }
 
-/* --- 정보 그리드 --- */
+/* --- Info Grid --- */
 .sub-info-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   margin-top: 6px;
 }
 
@@ -103,86 +101,95 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.83rem;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px dotted var(--color-border-light);
+}
+.sub-info-item:last-child {
+  border-bottom: none;
 }
 
 .sub-info-label {
-  color: #666;
+  color: var(--color-text-secondary);
   font-weight: 500;
   flex-shrink: 0;
 }
 
 .sub-info-value {
-  color: #333;
+  color: var(--color-text);
   font-weight: 600;
   text-align: right;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .sub-inline-btn {
-  border: 1px solid #ccc;
-  background: #f8f9fa;
-  color: #1a237e;
-  padding: 2px 8px;
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: #f8f9fb;
+  color: var(--color-primary);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
 }
 .sub-inline-btn:hover {
-  background: #e8eaf6;
-  border-color: #1a237e;
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
 }
 
 .sub-rooms-info {
-  font-size: 0.75rem;
-  color: #888;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
-/* --- 프로모 노트 --- */
+/* --- Promo Note --- */
 .sub-promo-note {
-  margin-top: 8px;
-  padding: 8px 12px;
+  margin-top: var(--space-sm);
+  padding: var(--space-sm) 12px;
   background: #d1fae5;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
   color: #065f46;
   font-weight: 600;
 }
 
-/* --- 액션 버튼 영역 --- */
+/* --- Action Buttons --- */
 .sub-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
-/* --- 빈 상태 --- */
+/* --- Empty State --- */
 .sub-empty {
   text-align: center;
   padding: 30px 0;
-  color: #999;
-  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
-/* --- 히스토리 --- */
+/* --- History --- */
 .sub-history-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
   max-height: 300px;
   overflow-y: auto;
-  margin-top: 8px;
+  margin-top: var(--space-sm);
 }
 
 .sub-history-item {
-  padding: 8px 10px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border-left: 3px solid #1a237e;
+  padding: var(--space-sm) 10px;
+  background: #f8f9fb;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-primary);
+  transition: background-color var(--transition-fast);
+}
+.sub-history-item:hover {
+  background: var(--color-primary-light);
 }
 
 .sub-history-meta {
@@ -194,30 +201,30 @@
 .sub-history-action {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #1a237e;
+  color: var(--color-primary);
   text-transform: uppercase;
 }
 
 .sub-history-date {
   font-size: 0.72rem;
-  color: #999;
+  color: var(--color-text-muted);
 }
 
 .sub-history-note {
   font-size: 0.78rem;
-  color: #555;
+  color: var(--color-text-secondary);
   margin-top: 3px;
 }
 
 .sub-history-by {
   font-size: 0.7rem;
-  color: #aaa;
+  color: var(--color-text-muted);
   margin-top: 2px;
 }
 
-/* --- 모달 내부 --- */
+/* --- Modal --- */
 .sub-modal-body {
-  padding: 16px;
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -226,29 +233,36 @@
 .sub-modal-body label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 0.85rem;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .sub-input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: var(--space-sm) 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-base);
 }
 .sub-input:focus {
-  border-color: #1a237e;
+  border-color: var(--color-primary);
 }
 
-/* --- 테이블 구독 칼럼 --- */
+/* --- Table Subscription Column (badge overlap fix) --- */
+.sub-col-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
 .sub-col-tier {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 2px var(--space-sm);
   border-radius: 12px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -259,15 +273,34 @@
 .sub-col-status {
   display: block;
   font-size: 0.7rem;
-  margin-top: 2px;
+  margin-top: 0;
 }
-.sub-col-status.pending { color: #f59e0b; }
-.sub-col-status.active { color: #22c55e; }
+.sub-col-status.pending   { color: var(--color-warning); }
+.sub-col-status.active    { color: var(--color-success); }
 .sub-col-status.suspended { color: #f97316; }
-.sub-col-status.expired { color: #ef4444; }
-.sub-col-status.cancelled { color: #6b7280; }
+.sub-col-status.expired   { color: var(--color-danger); }
+.sub-col-status.cancelled { color: var(--color-text-secondary); }
 
 .sub-col-none {
-  color: #ccc;
-  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* --- Scrollbar --- */
+.sub-panel-scroll::-webkit-scrollbar,
+.sub-history-list::-webkit-scrollbar {
+  width: 5px;
+}
+.sub-panel-scroll::-webkit-scrollbar-track,
+.sub-history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sub-panel-scroll::-webkit-scrollbar-thumb,
+.sub-history-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: var(--radius-full);
+}
+.sub-panel-scroll::-webkit-scrollbar-thumb:hover,
+.sub-history-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }

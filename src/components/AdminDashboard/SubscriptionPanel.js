@@ -13,6 +13,8 @@ import {
   cancelSubscriptionAPI,
   refundSubscriptionAPI,
   updateMonthlyCapAPI,
+  setPromotionAPI,
+  clearPromotionAPI,
 } from '../../api/api';
 import '../../styles/SubscriptionPanel.css';
 
@@ -50,6 +52,12 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
   // 상한캡 변경
   const [showCapModal, setShowCapModal] = useState(false);
   const [newCap, setNewCap] = useState('');
+
+  // 프로모션 설정 모달
+  const [showPromoModal, setShowPromoModal] = useState(false);
+  const [promoRate, setPromoRate] = useState('20');
+  const [promoDuration, setPromoDuration] = useState('6');
+  const [promoReason, setPromoReason] = useState('');
 
   // 히스토리 토글
   const [showHistory, setShowHistory] = useState(false);
@@ -114,13 +122,64 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
 
   const handleCapSubmit = () => {
     const cap = Number(newCap);
-    if (!cap || cap < 200000 || cap > 1000000) {
-      toast.error('상한캡은 200,000원 ~ 1,000,000원 사이여야 합니다.');
+    if (!cap || cap < 200000 || cap > 2000000) {
+      toast.error('상한캡은 200,000원 ~ 2,000,000원 사이여야 합니다.');
       return;
     }
     runAction('상한캡 변경', () => updateMonthlyCapAPI(hotelId, cap));
     setShowCapModal(false);
     setNewCap('');
+  };
+
+  const handlePromoSubmit = () => {
+    const rate = Number(promoRate);
+    const duration = Number(promoDuration);
+    if (!rate || rate < 1 || rate > 100) {
+      toast.error('할인율은 1~100% 사이여야 합니다.');
+      return;
+    }
+    if (!duration || duration < 1 || duration > 36) {
+      toast.error('기간은 1~36개월 사이여야 합니다.');
+      return;
+    }
+
+    // 시작일 자동 계산: 첫달무료 중이면 cycleEnd+1개월, 아니면 다음 달
+    const sub = data?.subscription;
+    let startYear, startMonth;
+    if (sub?.isFirstMonth && sub?.cycleEnd) {
+      const cycleEnd = new Date(sub.cycleEnd);
+      const nextDate = new Date(cycleEnd);
+      nextDate.setDate(nextDate.getDate() + 1);
+      startYear = nextDate.getFullYear();
+      startMonth = nextDate.getMonth() + 1;
+    } else {
+      const now = new Date();
+      const nextM = now.getMonth() + 2; // 다음 달 (0-based + 2)
+      if (nextM > 12) {
+        startYear = now.getFullYear() + 1;
+        startMonth = nextM - 12;
+      } else {
+        startYear = now.getFullYear();
+        startMonth = nextM;
+      }
+    }
+
+    runAction('프로모션 설정', () => setPromotionAPI(hotelId, {
+      discountRate: rate,
+      durationMonths: duration,
+      startYear,
+      startMonth,
+      reason: promoReason,
+    }));
+    setShowPromoModal(false);
+    setPromoRate('20');
+    setPromoDuration('6');
+    setPromoReason('');
+  };
+
+  const handlePromoClear = () => {
+    if (!window.confirm('계약 프로모션을 해제하시겠습니까?')) return;
+    runAction('프로모션 해제', () => clearPromotionAPI(hotelId));
   };
 
   if (loading) {
@@ -276,6 +335,62 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
               </div>
             )}
 
+            {/* 계약 프로모션 상태 */}
+            {sub.promotion?.discountRate > 0 && (
+              <div className="card">
+                <div className="card-title">
+                  <span>계약 프로모션</span>
+                  <span
+                    className="sub-status-badge"
+                    style={{
+                      backgroundColor: sub.promotionStatus?.status === 'active' ? '#22c55e20' : sub.promotionStatus?.status === 'pending' ? '#f59e0b20' : '#6b728020',
+                      color: sub.promotionStatus?.status === 'active' ? '#22c55e' : sub.promotionStatus?.status === 'pending' ? '#f59e0b' : '#6b7280',
+                      border: `1px solid ${sub.promotionStatus?.status === 'active' ? '#22c55e40' : sub.promotionStatus?.status === 'pending' ? '#f59e0b40' : '#6b728040'}`,
+                    }}
+                  >
+                    {sub.promotionStatus?.status === 'active' ? '적용 중'
+                      : sub.promotionStatus?.status === 'pending' ? '예정'
+                      : sub.promotionStatus?.status === 'expired' ? '만료' : '-'}
+                  </span>
+                </div>
+                <div className="sub-info-grid">
+                  <div className="sub-info-item">
+                    <span className="sub-info-label">할인율</span>
+                    <span className="sub-info-value" style={{ color: '#1a237e', fontWeight: 700 }}>{sub.promotion.discountRate}%</span>
+                  </div>
+                  <div className="sub-info-item">
+                    <span className="sub-info-label">기간</span>
+                    <span className="sub-info-value">
+                      {sub.promotion.startYear}-{String(sub.promotion.startMonth).padStart(2, '0')} ~ {sub.promotion.endYear}-{String(sub.promotion.endMonth).padStart(2, '0')}
+                      ({sub.promotion.durationMonths}개월)
+                    </span>
+                  </div>
+                  {sub.promotionStatus?.remainingMonths > 0 && (
+                    <div className="sub-info-item">
+                      <span className="sub-info-label">남은 기간</span>
+                      <span className="sub-info-value" style={{ color: '#3b82f6' }}>{sub.promotionStatus.remainingMonths}개월</span>
+                    </div>
+                  )}
+                  {sub.promotion.reason && (
+                    <div className="sub-info-item">
+                      <span className="sub-info-label">사유</span>
+                      <span className="sub-info-value">{sub.promotion.reason}</span>
+                    </div>
+                  )}
+                </div>
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    className="action-btn danger outline"
+                    onClick={handlePromoClear}
+                    disabled={processing}
+                    style={{ fontSize: '0.8rem', padding: '4px 12px' }}
+                  >
+                    프로모션 해제
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 액션 버튼들 */}
             <div className="card">
               <div className="card-title">
@@ -351,6 +466,15 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
                     ✅ 구독 재활성화
                   </button>
                 )}
+
+                {/* 프로모션 설정 */}
+                <button
+                  className="action-btn secondary"
+                  onClick={() => setShowPromoModal(true)}
+                  disabled={processing}
+                >
+                  🎁 프로모션 설정
+                </button>
 
                 {/* 환불 (모든 상태) */}
                 <button
@@ -448,7 +572,7 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
             </div>
             <div className="sub-modal-body">
               <label>
-                월 상한캡 (원) — 200,000 ~ 1,000,000
+                월 상한캡 (원) — 200,000 ~ 2,000,000
                 <input
                   type="number"
                   value={newCap}
@@ -456,7 +580,7 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
                   placeholder="500000"
                   className="sub-input"
                   min={200000}
-                  max={1000000}
+                  max={2000000}
                   step={50000}
                 />
               </label>
@@ -467,6 +591,67 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
                 style={{ marginTop: 12 }}
               >
                 변경 적용
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 프로모션 설정 모달 */}
+      {showPromoModal && (
+        <div className="modal-overlay" onClick={() => setShowPromoModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🎁 계약 프로모션 설정</h3>
+              <button className="close-btn" onClick={() => setShowPromoModal(false)}>✕</button>
+            </div>
+            <div className="sub-modal-body">
+              <label>
+                할인율 (1~100%)
+                <input
+                  type="number"
+                  value={promoRate}
+                  onChange={(e) => setPromoRate(e.target.value)}
+                  placeholder="20"
+                  className="sub-input"
+                  min={1}
+                  max={100}
+                />
+              </label>
+              <label>
+                기간 (1~36개월)
+                <input
+                  type="number"
+                  value={promoDuration}
+                  onChange={(e) => setPromoDuration(e.target.value)}
+                  placeholder="6"
+                  className="sub-input"
+                  min={1}
+                  max={36}
+                />
+              </label>
+              <label>
+                사유 (선택)
+                <input
+                  type="text"
+                  value={promoReason}
+                  onChange={(e) => setPromoReason(e.target.value)}
+                  placeholder="계약 조건, 특별 협약 등"
+                  className="sub-input"
+                />
+              </label>
+              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: 8 }}>
+                * 시작일은 {data?.subscription?.isFirstMonth && data?.subscription?.cycleEnd
+                  ? `첫달무료 종료 다음달 (${new Date(new Date(data.subscription.cycleEnd).getTime() + 86400000).getFullYear()}-${String(new Date(new Date(data.subscription.cycleEnd).getTime() + 86400000).getMonth() + 1).padStart(2, '0')})`
+                  : '다음 달'}부터 자동 적용됩니다.
+              </div>
+              <button
+                className="action-btn primary"
+                onClick={handlePromoSubmit}
+                disabled={processing}
+                style={{ marginTop: 12 }}
+              >
+                프로모션 설정
               </button>
             </div>
           </div>
