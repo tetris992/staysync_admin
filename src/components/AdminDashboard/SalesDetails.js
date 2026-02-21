@@ -40,8 +40,10 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // 할인율
+  // 청구 할인 (% 또는 금액)
   const [selectedDiscountRate, setSelectedDiscountRate] = useState(0);
+  const [discountFixedAmount, setDiscountFixedAmount] = useState('');
+  const [discountMode, setDiscountMode] = useState('rate'); // 'rate' | 'amount'
   const [showDiscountSelector, setShowDiscountSelector] = useState(false);
 
   // 히스토리 모달
@@ -60,8 +62,9 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
   }, [hotelId, year, month, getSales]);
 
   useEffect(() => {
-    if (salesData?.promotion?.currentDiscountRate !== undefined) {
-      setSelectedDiscountRate(salesData.promotion.currentDiscountRate);
+    // 청구 할인 = 직권 할인 (계약 프로모션과 별도, 기본 0%)
+    if (salesData?.promotion?.currentInvoiceDiscountRate !== undefined) {
+      setSelectedDiscountRate(salesData.promotion.currentInvoiceDiscountRate);
     } else {
       setSelectedDiscountRate(0);
     }
@@ -114,37 +117,49 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
     if (!salesData?.billing) return;
 
     const isResend = salesData.billing.isSent;
-    const currentDiscount = salesData.promotion?.currentDiscountRate || 0;
+    const currentDiscount = salesData.promotion?.currentInvoiceDiscountRate || 0;
     const hasDiscountChange = selectedDiscountRate !== currentDiscount;
-    const originalAmount = salesData.billing.originalAmount || salesData.billing.totalAmount || 0;
+    const afterPromo = salesData.billing.amountAfterPromotion || salesData.billing.originalAmount || 0;
+    const contractPromoRate = salesData.billing.contractPromotionRate || 0;
 
     let confirmMsg = '';
 
     if (isResend) {
       confirmMsg = hasDiscountChange
-        ? `⚠️ 할인율이 ${currentDiscount}% → ${selectedDiscountRate}%로 변경됩니다.\n수정된 금액으로 재발송할까요?`
+        ? `⚠️ 청구 할인이 ${currentDiscount}% → ${selectedDiscountRate}%로 변경됩니다.\n수정된 금액으로 재발송할까요?`
         : `⚠️ 청구서를 재발송할까요? (${salesData.billing.sentCount}회차)`;
     } else {
-      const { finalAmount } = calculateWithDiscount(originalAmount, selectedDiscountRate);
+      const fixedAmt = discountMode === 'amount' && Number(discountFixedAmount) > 0
+        ? Math.min(Number(discountFixedAmount), afterPromo) : 0;
+      const rateDiscount = Math.round(afterPromo * selectedDiscountRate / 100);
+      const invoiceDiscount = fixedAmt > 0 ? fixedAmt : rateDiscount;
+      const finalAmt = afterPromo - invoiceDiscount + (salesData.billing.carriedForwardAmount || 0);
+      const promoNote = contractPromoRate > 0 ? `\n• 계약 프로모션: ${contractPromoRate}% 적용됨` : '';
+      const hasDiscount = fixedAmt > 0 || selectedDiscountRate > 0;
+      const discountLabel = fixedAmt > 0
+        ? `${formatCurrency(fixedAmt)}`
+        : `${selectedDiscountRate}%`;
       confirmMsg =
-        selectedDiscountRate > 0
-          ? `${hotelName}님에게 ${year}년 ${month}월 청구서를 발송합니다.\n\n` +
-            `• 할인 전: ${formatCurrency(originalAmount)}\n` +
-            `• 할인율: ${selectedDiscountRate}%\n` +
-            `• 최종 금액: ${formatCurrency(finalAmount)}\n\n발송할까요?`
-          : `${hotelName}님에게 ${year}년 ${month}월 청구서를 발송할까요?\n\n• 청구 금액: ${formatCurrency(
-              originalAmount
-            )}`;
+        `${hotelName}님에게 ${year}년 ${month}월 청구서를 발송합니다.\n` +
+        promoNote +
+        (hasDiscount
+          ? `\n• 청구 할인: ${discountLabel}\n• 최종 금액: ${formatCurrency(finalAmt)}`
+          : `\n• 청구 금액: ${formatCurrency(finalAmt)}`) +
+        '\n\n발송할까요?';
     }
 
     if (!window.confirm(confirmMsg)) return;
 
     setIsProcessing(true);
     try {
-      await sendInvoiceAPI(hotelId, year, month, selectedDiscountRate);
+      const fixedAmt = discountMode === 'amount' && Number(discountFixedAmount) > 0
+        ? Number(discountFixedAmount) : null;
+      await sendInvoiceAPI(hotelId, year, month, selectedDiscountRate, fixedAmt);
       alert(isResend ? '✅ 청구서가 재발송되었습니다.' : '✅ 청구서가 발송되었습니다.');
       getSales(year, month);
       setShowDiscountSelector(false);
+      setDiscountFixedAmount('');
+      setDiscountMode('rate');
     } catch (error) {
       alert(`❌ 발송 실패: ${error.message}`);
     } finally {
@@ -239,12 +254,14 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
   const { revenue = {}, danjamStats = {}, billing = {}, promotion = {} } = showingData;
 
   const originalAmount = billing.originalAmount || billing.totalAmount || 0;
+  const afterPromoAmount = billing.amountAfterPromotion || originalAmount;
   const isBeforeApprovalData = showingData.isBeforeApproval;
   const isBetaMonth = showingData.isBetaMonth || billing.isBetaMonth || false;
 
+  // 청구 할인 미리보기 = 계약 프로모션 적용 후 금액 기준
   const previewCalculation = useMemo(
-    () => calculateWithDiscount(originalAmount, selectedDiscountRate),
-    [originalAmount, selectedDiscountRate]
+    () => calculateWithDiscount(afterPromoAmount, selectedDiscountRate),
+    [afterPromoAmount, selectedDiscountRate]
   );
 
   const discountOptions = promotion?.availableDiscountRates || [0, 10, 20, 30, 50, 100];
@@ -350,6 +367,36 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
             * 단잠 예약: 총 {danjamStats?.totalCount || 0}건 / {danjamStats?.totalNights || 0}박
           </div>
         </div>
+
+        {/* 계약 프로모션 안내 (청구/수납 위) */}
+        {!isBeforeApprovalData && !isBetaMonth && promotion?.contractPromotionRate > 0 && promotion?.contractPromotionInfo && (
+          <div
+            className="alert-box"
+            style={{
+              backgroundColor: '#f5f3ff',
+              borderColor: '#8b5cf6',
+              borderLeft: '4px solid #8b5cf6',
+              color: '#5b21b6',
+            }}
+          >
+            <div style={{ fontSize: '1.1rem' }}>🎁</div>
+            <div>
+              <strong style={{ color: '#5b21b6' }}>
+                계약 프로모션 {promotion.contractPromotionRate}% 할인이 아래 청구금액에 적용됨
+              </strong>
+              <p style={{ color: '#555', margin: '4px 0 0' }}>
+                기간: {promotion.contractPromotionInfo.startYear}-{String(promotion.contractPromotionInfo.startMonth).padStart(2, '0')} ~ {promotion.contractPromotionInfo.endYear}-{String(promotion.contractPromotionInfo.endMonth).padStart(2, '0')}
+                {promotion.contractPromotionInfo.remainingMonths > 0 && ` (${promotion.contractPromotionInfo.remainingMonths}개월 남음)`}
+              </p>
+              {promotion.contractPromotionInfo.reason && (
+                <p style={{ color: '#888', margin: '2px 0 0' }}>사유: {promotion.contractPromotionInfo.reason}</p>
+              )}
+              <p style={{ color: '#888', margin: '4px 0 0', fontSize: '0.8rem' }}>
+                * 청구서 발송 시 추가 직권 할인은 아래 "청구 할인"에서 설정
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* 2) 청구/수납 + 엑셀 전송 */}
         <div className="card">
@@ -469,17 +516,26 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
 
             <hr className="divider" />
 
-            {billing.promotionDiscountRate > 0 && billing.isSent && (
+            {/* 계약 프로모션 (자동 적용) */}
+            {billing.contractPromotionRate > 0 && (
               <>
-                <div className="row">
-                  <span>할인 전 금액</span>
-                  <span className="strike-through">{formatCurrency(billing.originalAmount)}</span>
+                <div className="row" style={{ color: '#999' }}>
+                  <span>할인 전</span>
+                  <span style={{ textDecoration: 'line-through' }}>{formatCurrency(billing.originalAmount)}</span>
                 </div>
-                <div className="row discount">
-                  <span>✨ 프로모션 할인 ({billing.promotionDiscountRate}%)</span>
-                  <span>-{formatCurrency(billing.promotionDiscountAmount)}</span>
+                <div className="row" style={{ color: '#8b5cf6' }}>
+                  <span>계약 프로모션 (-{billing.contractPromotionRate}%)</span>
+                  <span>-{formatCurrency(billing.contractPromotionAmount || Math.round(billing.originalAmount * billing.contractPromotionRate / 100))}</span>
                 </div>
               </>
+            )}
+
+            {/* 청구 할인 (직권, 1회성) — 청구서에만 */}
+            {billing.isSent && billing.discountRate > 0 && (
+              <div className="row discount">
+                <span>청구 할인 (-{billing.discountRate}%)</span>
+                <span>-{formatCurrency(billing.discountAmount)}</span>
+              </div>
             )}
 
             {billing.carriedForwardAmount > 0 && (
@@ -524,7 +580,7 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {isBetaMonth ? '✨' : <FaPercentage />} {isBetaMonth ? '베타 테스트 할인' : '프로모션 할인'}
+                  {isBetaMonth ? '✨' : <FaPercentage />} {isBetaMonth ? '베타 테스트 할인' : '청구 할인'}
                 </strong>
 
                 {!billing.isSent && !isBetaMonth && (
@@ -562,105 +618,141 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
                 </div>
               )}
 
-              {!isBetaMonth && promotion?.contractPromotionRate > 0 && promotion?.contractPromotionInfo && (
-                <div
-                  style={{
-                    fontSize: '0.8rem',
-                    color: '#555',
-                    backgroundColor: 'white',
-                    padding: '8px',
-                    borderRadius: '6px',
-                    marginBottom: '10px',
-                    border: '1px solid #1a237e30',
-                  }}
-                >
-                  <div style={{ fontWeight: 'bold', color: '#1a237e', marginBottom: 4 }}>
-                    🎁 계약 프로모션: {promotion.contractPromotionRate}% 할인 기본 적용
-                  </div>
-                  <div>
-                    기간: {promotion.contractPromotionInfo.startYear}-{String(promotion.contractPromotionInfo.startMonth).padStart(2, '0')} ~ {promotion.contractPromotionInfo.endYear}-{String(promotion.contractPromotionInfo.endMonth).padStart(2, '0')}
-                    {promotion.contractPromotionInfo.remainingMonths > 0 && ` (${promotion.contractPromotionInfo.remainingMonths}개월 남음)`}
-                  </div>
-                  {promotion.contractPromotionInfo.reason && (
-                    <div style={{ color: '#888', marginTop: 2 }}>사유: {promotion.contractPromotionInfo.reason}</div>
-                  )}
-                  <div style={{ color: '#888', marginTop: 4 }}>
-                    * "변경" 버튼으로 이번 달에 한해 다른 할인율 적용 가능
-                  </div>
-                </div>
-              )}
+              {/* 계약 프로모션 안내는 청구 및 수납 카드 위에 별도 표시 */}
 
               {showDiscountSelector && !isBetaMonth && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginBottom: '10px' }}>
-                  {discountOptions.map((rate) => (
+                <>
+                  {/* 모드 전환 탭 */}
+                  <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
                     <button
-                      key={rate}
-                      onClick={() => setSelectedDiscountRate(rate)}
+                      onClick={() => { setDiscountMode('rate'); setDiscountFixedAmount(''); }}
                       style={{
-                        padding: '6px 0',
-                        border: selectedDiscountRate === rate ? '2px solid #1a237e' : '1px solid #ddd',
-                        backgroundColor: selectedDiscountRate === rate ? '#e3f2fd' : 'white',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: selectedDiscountRate === rate ? 'bold' : 'normal',
-                        color: selectedDiscountRate === rate ? '#1a237e' : '#333',
-                        fontSize: '0.8rem',
-                        whiteSpace: 'nowrap',
+                        flex: 1, padding: '5px 0', border: 'none', borderRadius: 4, cursor: 'pointer',
+                        backgroundColor: discountMode === 'rate' ? '#1a237e' : '#e0e0e0',
+                        color: discountMode === 'rate' ? 'white' : '#333', fontSize: '0.8rem', fontWeight: 600,
                       }}
                     >
-                      {rate}%
+                      % 할인
                     </button>
-                  ))}
-                </div>
+                    <button
+                      onClick={() => { setDiscountMode('amount'); setSelectedDiscountRate(0); }}
+                      style={{
+                        flex: 1, padding: '5px 0', border: 'none', borderRadius: 4, cursor: 'pointer',
+                        backgroundColor: discountMode === 'amount' ? '#1a237e' : '#e0e0e0',
+                        color: discountMode === 'amount' ? 'white' : '#333', fontSize: '0.8rem', fontWeight: 600,
+                      }}
+                    >
+                      금액 할인
+                    </button>
+                  </div>
+
+                  {discountMode === 'rate' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                      {discountOptions.map((rate) => (
+                        <button
+                          key={rate}
+                          onClick={() => { setSelectedDiscountRate(rate); setDiscountFixedAmount(''); }}
+                          style={{
+                            padding: '6px 0',
+                            border: selectedDiscountRate === rate && !discountFixedAmount ? '2px solid #1a237e' : '1px solid #ddd',
+                            backgroundColor: selectedDiscountRate === rate && !discountFixedAmount ? '#e3f2fd' : 'white',
+                            borderRadius: '4px', cursor: 'pointer',
+                            fontWeight: selectedDiscountRate === rate && !discountFixedAmount ? 'bold' : 'normal',
+                            color: selectedDiscountRate === rate && !discountFixedAmount ? '#1a237e' : '#333',
+                            fontSize: '0.8rem', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {rate}%
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {discountMode === 'amount' && (
+                    <div style={{ marginBottom: 10 }}>
+                      <input
+                        type="number"
+                        value={discountFixedAmount}
+                        onChange={(e) => setDiscountFixedAmount(e.target.value)}
+                        placeholder="할인 금액 (원)"
+                        style={{
+                          width: '100%', padding: '8px 12px', border: '1px solid #ddd',
+                          borderRadius: 6, fontSize: '0.9rem', boxSizing: 'border-box',
+                        }}
+                        min={0}
+                        max={afterPromoAmount}
+                      />
+                      {discountFixedAmount && Number(discountFixedAmount) > 0 && (
+                        <div style={{ fontSize: '0.75rem', color: '#888', marginTop: 4 }}>
+                          = {afterPromoAmount > 0 ? ((Number(discountFixedAmount) / afterPromoAmount) * 100).toFixed(1) : 0}% 해당
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
 
-              {!isBetaMonth &&
-                previewCalculation &&
-                selectedDiscountRate !== (billing.promotionDiscountRate || 0) && (
+              {/* 미리보기 */}
+              {!isBetaMonth && (discountMode === 'rate' ? selectedDiscountRate > 0 : Number(discountFixedAmount) > 0) && (
+                <div
+                  style={{
+                    fontSize: '0.8rem', color: '#666', marginTop: '10px', padding: '8px',
+                    backgroundColor: 'white', borderRadius: '6px', border: '1px solid #e0e0e0',
+                  }}
+                >
+                  <div style={{ marginBottom: '4px', fontWeight: 'bold', color: '#333' }}>💡 청구 할인 적용 예상:</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span>{billing.contractPromotionRate > 0 ? '프로모션 적용 후:' : '할인 전:'}</span>
+                    <span>{formatCurrency(afterPromoAmount)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#d32f2f' }}>
+                    <span>
+                      청구 할인 ({discountMode === 'amount'
+                        ? formatCurrency(Number(discountFixedAmount))
+                        : `${selectedDiscountRate}%`}):
+                    </span>
+                    <span>
+                      -{formatCurrency(discountMode === 'amount'
+                        ? Math.min(Number(discountFixedAmount) || 0, afterPromoAmount)
+                        : previewCalculation.discountAmount)}
+                    </span>
+                  </div>
                   <div
                     style={{
-                      fontSize: '0.8rem',
-                      color: '#666',
-                      marginTop: '10px',
-                      padding: '8px',
-                      backgroundColor: 'white',
-                      borderRadius: '6px',
-                      border: '1px solid #e0e0e0',
+                      display: 'flex', justifyContent: 'space-between', fontWeight: 'bold',
+                      color: '#1a237e', paddingTop: '4px', borderTop: '1px dashed #eee',
                     }}
                   >
-                    <div style={{ marginBottom: '4px', fontWeight: 'bold', color: '#333' }}>💡 적용 예상 금액:</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                      <span>할인 전:</span>
-                      <span>{formatCurrency(originalAmount)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#d32f2f' }}>
-                      <span>할인 ({selectedDiscountRate}%):</span>
-                      <span>-{formatCurrency(previewCalculation.discountAmount)}</span>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        fontWeight: 'bold',
-                        color: '#1a237e',
-                        paddingTop: '4px',
-                        borderTop: '1px dashed #eee',
-                      }}
-                    >
-                      <span>최종 합계:</span>
-                      <span>{formatCurrency(previewCalculation.finalAmount + (billing.carriedForwardAmount || 0))}</span>
-                    </div>
+                    <span>최종 합계:</span>
+                    <span>
+                      {formatCurrency(
+                        (discountMode === 'amount'
+                          ? afterPromoAmount - Math.min(Number(discountFixedAmount) || 0, afterPromoAmount)
+                          : previewCalculation.finalAmount)
+                        + (billing.carriedForwardAmount || 0)
+                      )}
+                    </span>
                   </div>
-                )}
+                </div>
+              )}
 
               {!showDiscountSelector && (
                 <div style={{ fontSize: '0.8rem', color: '#666', display: 'flex', justifyContent: 'space-between' }}>
                   <span>
-                    현재 설정: <strong style={{ color: isBetaMonth ? '#2e7d32' : '#333' }}>{selectedDiscountRate}%</strong>
+                    청구 할인: <strong style={{ color: isBetaMonth ? '#2e7d32' : '#333' }}>
+                      {discountFixedAmount && Number(discountFixedAmount) > 0
+                        ? formatCurrency(Number(discountFixedAmount))
+                        : `${selectedDiscountRate}%`}
+                    </strong>
+                    {selectedDiscountRate === 0 && !Number(discountFixedAmount) && !isBetaMonth && ' (없음)'}
                   </span>
-                  {selectedDiscountRate > 0 && (
+                  {(selectedDiscountRate > 0 || Number(discountFixedAmount) > 0) && (
                     <span style={{ color: '#d32f2f' }}>
-                      -{formatCurrency(billing.promotionDiscountAmount || previewCalculation.discountAmount)}
+                      -{formatCurrency(
+                        discountFixedAmount && Number(discountFixedAmount) > 0
+                          ? Math.min(Number(discountFixedAmount), afterPromoAmount)
+                          : previewCalculation.discountAmount
+                      )}
                     </span>
                   )}
                 </div>

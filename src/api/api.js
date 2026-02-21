@@ -176,13 +176,13 @@ export const fetchAdminHotelSales = async (hotelId, year, month) => {
   }
 };
 
-export const sendInvoiceAPI = async (hotelId, year, month, discountRate = 0) => {
+export const sendInvoiceAPI = async (hotelId, year, month, discountRate = 0, discountFixedAmount = null) => {
   try {
-    const response = await api.post(`/api/admin/users/${hotelId}/invoice`, {
-      year,
-      month,
-      discountRate,
-    });
+    const body = { year, month, discountRate };
+    if (discountFixedAmount !== null && discountFixedAmount > 0) {
+      body.discountFixedAmount = discountFixedAmount;
+    }
+    const response = await api.post(`/api/admin/users/${hotelId}/invoice`, body);
     return response.data;
   } catch (err) {
     throw new ApiError(
@@ -440,13 +440,15 @@ export const updateMonthlyCapAPI = async (hotelId, monthlyCap) => {
   }
 };
 
-export const setPromotionAPI = async (hotelId, { discountRate, durationMonths, startYear, startMonth, reason }) => {
+export const setPromotionAPI = async (hotelId, { discountRate, durationMonths, startYear, startMonth, endYear, endMonth, reason }) => {
   try {
     const response = await api.post(`/api/admin/users/${hotelId}/subscription/promotion`, {
       discountRate,
       durationMonths,
       startYear,
       startMonth,
+      endYear,
+      endMonth,
       reason,
     });
     return response.data;
