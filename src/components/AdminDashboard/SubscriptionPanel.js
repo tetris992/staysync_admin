@@ -330,6 +330,12 @@ const SubscriptionPanel = ({ hotelId, hotelName }) => {
                       <span>{formatMoney(cost.doorLockFee)}</span>
                     </div>
                   )}
+                  {cost.voiceBookingFee > 0 && (
+                    <div className="row">
+                      <span>AI 음성예약</span>
+                      <span>{formatMoney(cost.voiceBookingFee)}</span>
+                    </div>
+                  )}
                   <div className="row" style={{ borderTop: '1px solid #eee', paddingTop: 6, marginTop: 4 }}>
                     <span>소계</span>
                     <span>{formatMoney(cost.subtotal)}</span>

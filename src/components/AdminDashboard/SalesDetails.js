@@ -477,6 +477,13 @@ const SalesDetails = ({ hotelId, hotelName, approvalDate }) => {
               </div>
             )}
 
+            {billing.voiceBookingFee > 0 && (
+              <div className="row">
+                <span>AI 음성예약</span>
+                <span>{formatCurrency(billing.voiceBookingFee)}</span>
+              </div>
+            )}
+
             <div className="row" style={{ fontSize: '0.85rem', color: '#666' }}>
               <span>소계</span>
               <span>{formatCurrency(billing.subtotal)}</span>
